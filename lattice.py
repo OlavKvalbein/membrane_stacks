@@ -6,38 +6,37 @@ class Lattice():
     def __init__(self, L, Lz, T_J_ratio, Jz_J_ratio):
         self.L = L
         self.Lz = Lz
+        self.shape = (Lz, L, L)
         self.J_T_ratio = 1/T_J_ratio
         self.Jz_J_ratio = Jz_J_ratio
 
         self.rng = np.random.default_rng()
-        self.spin = self.init_spin()
-        self.nesw_sum = self.init_nesw_sum()
-        self.ud_sum = self.init_ud_sum()
+        self.init_spin()
+        self.init_nesw_sum()
+        self.init_ud_sum()
 
     def init_spin(self):
-        return self.rng.choice([-1,1], size=(self.L, self.L, self.Lz))
+        self.spin = self.rng.choice([np.int8(-1),np.int8(1)], size=self.shape)
     
     def init_nesw_sum(self):
-        nesw_sum = np.zeros((self.L, self.L, self.Lz))
+        self.nesw_sum = np.zeros(self.shape, dtype=np.int8)
         for z in range(self.Lz):
             for x in range(self.L):
                 for y in range(self.L):
-                    n = self.spin[x,y+1,z] if y < self.L-1 else 0
-                    e = self.spin[x+1,y,z] if x < self.L-1 else 0
-                    s = self.spin[x,y-1,z] if y > 0 else 0
-                    w = self.spin[x-1,y,z] if x > 0 else 0
-                    nesw_sum[x,y,z] = n + e + s + w
-        return nesw_sum
+                    n = self.spin[z,y+1,x] if y < self.L-1 else 0
+                    e = self.spin[z,y,x+1] if x < self.L-1 else 0
+                    s = self.spin[z,y-1,x] if y > 0 else 0
+                    w = self.spin[z,y,x-1] if x > 0 else 0
+                    self.nesw_sum[z,y,x] = n + e + s + w
 
     def init_ud_sum(self):
-        ud_sum = np.zeros((self.L, self.L, self.Lz))
+        self.ud_sum = np.zeros(self.shape, dtype=np.int8)
         for z in range(self.Lz):
             for x in range(self.L):
                 for y in range(self.L):
-                    u = self.spin[x,y,z+1] if z < self.Lz-1 else 0
-                    d = self.spin[x,y,z-1] if z > 0 else 0
-                    ud_sum[x,y,z] = u + d
-        return ud_sum
+                    u = self.spin[z+1,y,x] if z < self.Lz-1 else 0
+                    d = self.spin[z-1,y,x] if z > 0 else 0
+                    self.ud_sum[z,y,x] = u + d
 
     # update grid by one MC_step
     def MC_step(self):
@@ -59,7 +58,7 @@ class Lattice():
             z = self.rng.integers(self.Lz)
             x1, y1 = self.rng.integers(0, self.L, 2)
             x2, y2 = self.random_neighbor(x1, y1)
-            if self.spin[x1,y1,z] != self.spin[x2,y2,z]:
+            if self.spin[z,y1,x1] != self.spin[z,y2,x2]:
                 return z, x1, y1, x2, y2
 
     def random_neighbor(self, x1, y1):
@@ -94,20 +93,20 @@ class Lattice():
         return x2, y2
 
     def energy_diff(self, z, x1, y1, x2, y2):
-        s1 = self.spin[x1,y1,z]
-        N1 = self.nesw_sum[x1,y1,z]
-        N2 = self.nesw_sum[x2,y2,z]
-        M1 = self.ud_sum[x1,y1,z]
-        M2 = self.ud_sum[x2,y2,z]
+        s1 = self.spin[z,y1,x1]
+        N1 = self.nesw_sum[z,y1,x1]
+        N2 = self.nesw_sum[z,y2,x2]
+        M1 = self.ud_sum[z,y1,x1]
+        M2 = self.ud_sum[z,y2,x2]
         return -self.J_T_ratio*2*s1*(N2-N1-2*s1+self.Jz_J_ratio*(M2-M1))
 
     def exchange_spins(self, z, x1, y1, x2, y2):
         # update neighbor sums
-        self.nesw_sum[x1,y1,z] += 2*self.spin[x1,y1,z]
-        self.nesw_sum[x2,y2,z] -= 2*self.spin[x1,y1,z]
+        self.nesw_sum[z,y1,x1] += 2*self.spin[z,y1,x1]
+        self.nesw_sum[z,y2,x2] -= 2*self.spin[z,y1,x1]
 
-        self.spin[x1,y1,z] *= -1
-        self.spin[x2,y2,z] *= -1
+        self.spin[z,y1,x2] *= -1
+        self.spin[z,y2,x2] *= -1
 
 
 def lattice_series(L, Lz, T_J_ratio, Jz_J_ratio, MC_steps):
