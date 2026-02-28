@@ -11,32 +11,10 @@ class Lattice():
         self.Jz_J_ratio = Jz_J_ratio
 
         self.rng = np.random.default_rng()
-        self.init_spin()
-        self.init_nesw_sum()
-        self.init_ud_sum()
+        self.spin = self.init_spin()
 
     def init_spin(self):
-        self.spin = self.rng.choice([np.int8(-1),np.int8(1)], size=self.shape)
-    
-    def init_nesw_sum(self):
-        self.nesw_sum = np.zeros(self.shape, dtype=np.int8)
-        for z in range(self.Lz):
-            for x in range(self.L):
-                for y in range(self.L):
-                    n = self.spin[z,y+1,x] if y < self.L-1 else 0
-                    e = self.spin[z,y,x+1] if x < self.L-1 else 0
-                    s = self.spin[z,y-1,x] if y > 0 else 0
-                    w = self.spin[z,y,x-1] if x > 0 else 0
-                    self.nesw_sum[z,y,x] = n + e + s + w
-
-    def init_ud_sum(self):
-        self.ud_sum = np.zeros(self.shape, dtype=np.int8)
-        for z in range(self.Lz):
-            for x in range(self.L):
-                for y in range(self.L):
-                    u = self.spin[z+1,y,x] if z < self.Lz-1 else 0
-                    d = self.spin[z-1,y,x] if z > 0 else 0
-                    self.ud_sum[z,y,x] = u + d
+        return self.rng.choice([np.int8(-1),np.int8(1)], size=self.shape)
 
     # update grid by one MC_step
     def MC_step(self):
@@ -44,7 +22,8 @@ class Lattice():
             self.step()
 
     def step(self):
-        z, x1, y1, x2, y2 = self.random_opposite_neighbors()
+        # pick random point and cardinal direction of a random neighbor in the plane
+        x, y, z, nesw = self.random_opposite_neighbors()
         deltaE = self.energy_diff(z, x1, y1, x2, y2) # acually DeltaE/T
         if deltaE < 0:
             self.exchange_spins(z, x1, y1, x2, y2)
@@ -92,7 +71,7 @@ class Lattice():
                     y2 = 1 if y1 == 0 else self.L - 2
         return x2, y2
 
-    def energy_diff(self, z, x1, y1, x2, y2):
+    def energy_diff(self, x, y, z, nesw):
         s1 = self.spin[z,y1,x1]
         N1 = self.nesw_sum[z,y1,x1]
         N2 = self.nesw_sum[z,y2,x2]
