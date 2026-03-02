@@ -4,11 +4,11 @@ from lattice import lattice_series
 
 def plot_series():
     L = 20
-    Lz = 5
-    T_J_ratio = 1.5
-    Jz_J_ratio = 0.5
+    Lz = 3
+    T_J_ratio = 0.3
+    Jz_J_ratio = 0.0
 
-    show_after_steps = [0, 50, 100, 150, 200]
+    show_after_steps = [0, 50, 100, 200]
     MC_steps = max(show_after_steps)
 
     series = lattice_series(L, Lz, T_J_ratio, Jz_J_ratio, MC_steps)

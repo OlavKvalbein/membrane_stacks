@@ -66,7 +66,7 @@ class Lattice():
         return self.spin[z,y,x+1] + self.spin[z,y,x-1] + self.spin[z,y+1,x] + self.spin[z,y-1,x]
 
     def exchange_spins(self, x1, y1, x2, y2, z):
-        self.spin[z,y1,x2] *= -1
+        self.spin[z,y1,x1] *= -1
         self.spin[z,y2,x2] *= -1
     
     def get_spin(self):
