@@ -25,6 +25,7 @@ class Lattice():
         for _ in range(self.L**2 * self.Lz):
             self.step()
 
+    # computes DeltaE
     def step(self):
         x1, y1, x2, y2, z = self.random_opposite_neighbors()
         deltaE = self.energy_diff(x1, y1, x2, y2, z) # acually DeltaE/T
