@@ -25,6 +25,7 @@ class Lattice():
         for _ in range(self.L**2 * self.Lz):
             self.step()
 
+    # computes DeltaE
     def step(self):
         x1, y1, x2, y2, z = self.random_opposite_neighbors()
         deltaE = self.energy_diff(x1, y1, x2, y2, z) # acually DeltaE/T
@@ -66,7 +67,7 @@ class Lattice():
         return self.spin[z,y,x+1] + self.spin[z,y,x-1] + self.spin[z,y+1,x] + self.spin[z,y-1,x]
 
     def exchange_spins(self, x1, y1, x2, y2, z):
-        self.spin[z,y1,x2] *= -1
+        self.spin[z,y1,x1] *= -1
         self.spin[z,y2,x2] *= -1
     
     def get_spin(self):
