@@ -2,7 +2,6 @@
 #define MAIN_H
 
 double rand01();
-int rand0n(int n);
 int rand_i_range(int min, int max);
 
 typedef struct

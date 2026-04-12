@@ -10,12 +10,6 @@ double rand01()
 	return (double)rand() / RAND_MAX;
 }
 
-// random integer in [0, n]
-int rand0n(int n)
-{
-	return rand() % (n+1);
-}
-
 // random integer in [min, max]
 int rand_i_range(int min, int max)
 {

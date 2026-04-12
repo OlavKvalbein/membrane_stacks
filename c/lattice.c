@@ -28,7 +28,7 @@ Lattice new_lattice(int L, int Lz, double T, double Jz)
 	Lattice lat = {L, Lz, T, Jz, spin};
 	
 	fill(lat, 0, Lz+2, 0, L+2, 0, L+2, 0);
-	fill(lat, 1, Lz+1, 1, L+1, 1, L+1, rand0n(1)*2 - 1);
+	fill(lat, 1, Lz+1, 1, L+1, 1, L+1, rand_i_range(0,1)*2 - 1);
 
 	return lat;
 }
@@ -71,7 +71,7 @@ void random_neighbors(Lattice lat, int* z, int* i1, int* j1, int* i2, int* j2)
 		*i1 = *i2 = rand_i_range(1, lat.L + 1);
 		*j1 = *j2 = rand_i_range(1, lat.L + 1);
 
-		int offset = rand0n(1)*2 - 1;
+		int offset = rand_i_range(0,1)*2 - 1;
 		if (rand01() < 0.5)
 			*i2 += offset;
 		else
@@ -149,11 +149,4 @@ void export_lattice(Lattice lat, char* filepath)
 	}
     fclose(file);
 	printf("Exported file to %s\n", filepath);
-}
-
-void testf(char *filepath)
-{
-	FILE* file = fopen(filepath, "w");
-	fprintf(file, "yeaeah");
-	fclose(file);
 }
