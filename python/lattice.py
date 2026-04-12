@@ -1,14 +1,14 @@
 import numpy as np
+import sys
 
 class Lattice():
-    MAX_TRIES_SELECTING = 1000
-
-    def __init__(self, L, Lz, T_J_ratio, Jz_J_ratio):
+    def __init__(self, L, Lz, T, Jz):
         self.L = L
-        self.Lz = Lz
-        self.J_T_ratio = 1/T_J_ratio
-        self.Jz_J_ratio = Jz_J_ratio
+        self.Lz = Lz    
+        self.T = T      # where k_B = J = 1
+        self.Jz = Jz    # Jz = Jz/J
 
+        self.max_tries_selecting = self.L*self.Lz**2 * 10
         self.rng = np.random.default_rng()
         self.spin = self.init_spin()
 
@@ -25,7 +25,6 @@ class Lattice():
         for _ in range(self.L**2 * self.Lz):
             self.step()
 
-    # computes DeltaE
     def step(self):
         x1, y1, x2, y2, z = self.random_opposite_neighbors()
         deltaE = self.energy_diff(x1, y1, x2, y2, z) # acually DeltaE/T
@@ -37,7 +36,7 @@ class Lattice():
                 self.exchange_spins(x1, y1, x2, y2, z)
 
     def random_opposite_neighbors(self):
-        for _ in range(self.MAX_TRIES_SELECTING):
+        for _ in range(self.max_tries_selecting):
             # generate random point not on the 0-spin boundary
             z = self.rng.integers(1,self.Lz+1)
             x1, y1 = self.rng.integers(1, self.L+1, 2)
@@ -54,6 +53,7 @@ class Lattice():
             if self.spin[z,y1,x1] == -self.spin[z,y2,x2]:
                 return x1, y1, x2, y2, z
         print("could not find random opposite neighbors")
+        quit()
 
     def energy_diff(self, x1, y1, x2, y2, z):
         s1 = self.spin[z,y1,x1]
@@ -61,7 +61,7 @@ class Lattice():
         N2 = self.nesw_sum(x2, y2, z)
         U1 = self.spin[z+1,y1,x1] + self.spin[z-1,y1,x1]
         U2 = self.spin[z+1,y2,x2] + self.spin[z-1,y2,x2]
-        return self.J_T_ratio*2*s1*(N1 - N2 + 2*s1 + self.Jz_J_ratio*(U1 - U2))
+        return 2*s1*(N1 - N2 + 2*s1 + self.Jz*(U1 - U2))
                 
     def nesw_sum(self, x, y, z):
         return self.spin[z,y,x+1] + self.spin[z,y,x-1] + self.spin[z,y+1,x] + self.spin[z,y-1,x]
@@ -73,8 +73,8 @@ class Lattice():
     def get_spin(self):
         return self.spin[1:-1,1:-1,1:-1].copy()
 
-def lattice_series(L, Lz, T_J_ratio, Jz_J_ratio, MC_steps):
-    lattice = Lattice(L, Lz, T_J_ratio, Jz_J_ratio)
+def lattice_series(L, Lz, T, Jz, MC_steps):
+    lattice = Lattice(L, Lz, T, Jz)
     series = [lattice.get_spin()]
 
     for i in range(MC_steps):
