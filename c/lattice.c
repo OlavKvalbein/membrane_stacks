@@ -4,14 +4,14 @@
 
 #include "main.h"
 
-void set_spin(Lattice lat, int z, int i, int j, char val)
+void set_spin(Lattice* lat, int z, int i, int j, char val)
 {
-	lat.spin[z*(lat.L+2)*(lat.L+2) + i*(lat.L+2) + j] = val; 
+	lat->spin[z*(lat->L+2)*(lat->L+2) + i*(lat->L+2) + j] = val; 
 }
 
-char spin(Lattice lat, int z, int i, int j)
+char spin(const Lattice* lat, int z, int i, int j)
 {
-	return lat.spin[z*(lat.L+2)*(lat.L+2) + i*(lat.L+2) + j];
+	return lat->spin[z*(lat->L+2)*(lat->L+2) + i*(lat->L+2) + j];
 }
 
 #define fill(lat, z0, z1, i0, i1, j0, j1, expr) \
@@ -22,20 +22,25 @@ char spin(Lattice lat, int z, int i, int j)
 				set_spin(lat, z, i, j, (expr));	\
 })
 
+void reset_lattice(Lattice *lat)
+{
+	fill(lat, 0, lat->Lz+2, 0, lat->L+2, 0, lat->L+2, 0);
+	fill(lat, 1, lat->Lz+1, 1, lat->L+1, 1, lat->L+1, rand_i(0,1)*2 - 1);
+}
+
 Lattice new_lattice(int L, int Lz, double T, double Jz)
 {
 	char* spin = (char*)malloc((Lz+2)*(L+2)*(L+2)*sizeof(char));
 	Lattice lat = {L, Lz, T, Jz, spin};
-	
-	fill(lat, 0, Lz+2, 0, L+2, 0, L+2, 0);
-	fill(lat, 1, Lz+1, 1, L+1, 1, L+1, rand_i_range(0,1)*2 - 1);
+
+	reset_lattice(&lat);
 
 	return lat;
 }
 
 
 // Assumes spins at (z, i1, j1) and (z, i2, j2) are opposite
-void exchange_spin(Lattice lat, int z, int i1, int j1, int i2, int j2)
+void exchange_spin(Lattice* lat, int z, int i1, int j1, int i2, int j2)
 {
 	char s = spin(lat, z, i1, j1);
 	set_spin(lat, z, i1, j1, -s);
@@ -43,14 +48,14 @@ void exchange_spin(Lattice lat, int z, int i1, int j1, int i2, int j2)
 }
 
 // spin sum of the 4 neighbors in the plane 
-char nesw_sum(Lattice lat, int z, int i, int j)
+char nesw_sum(const Lattice* lat, int z, int i, int j)
 {
 	return spin(lat, z, i+1, j) + spin(lat, z, i-1, j)
 		+ spin(lat, z, i, j+1) + spin(lat, z, i, j-1);
 }
 
 // Gives the energy change from flipping (z, i1, j1) and (z, i2, j2)
-double energy_diff(Lattice lat, int z, int i1, int j1, int i2, int j2)
+double energy_diff(const Lattice* lat, int z, int i1, int j1, int i2, int j2)
 {
 	char s = spin(lat, z, i1, j1);
 	char N1 = nesw_sum(lat, z, i1, j1);
@@ -58,20 +63,20 @@ double energy_diff(Lattice lat, int z, int i1, int j1, int i2, int j2)
 	char U1 = spin(lat, z+1, i1, j1) + spin(lat, z-1, i1, j1);
 	char U2 = spin(lat, z+1, i2, j2) + spin(lat, z-1, i2, j2);
 
-	return 2*s*(N1 - N2 + 2*s + lat.Jz*(U1 - U2));
+	return 2*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
 }
 
 // Finds 2 neighbors in the same plane.
-void random_neighbors(Lattice lat, int* z, int* i1, int* j1, int* i2, int* j2)
+void random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int* i2, int* j2)
 {
-	int max_tries_selecting = lat.Lz * lat.L * lat.L * 10;
+	int max_tries_selecting = lat->Lz * lat->L * lat->L * 10;
 	for (int i = 0; i < max_tries_selecting; i++) {		
 		// (z, i1, j1) is always in the interior, (z, i2, j2) not necessarily.
-		*z = rand_i_range(1, lat.Lz + 1);
-		*i1 = *i2 = rand_i_range(1, lat.L + 1);
-		*j1 = *j2 = rand_i_range(1, lat.L + 1);
+		*z = rand_i(1, lat->Lz + 1);
+		*i1 = *i2 = rand_i(1, lat->L + 1);
+		*j1 = *j2 = rand_i(1, lat->L + 1);
 
-		int offset = rand_i_range(0,1)*2 - 1;
+		int offset = rand_i(0,1)*2 - 1;
 		if (rand01() < 0.5)
 			*i2 += offset;
 		else
@@ -86,7 +91,7 @@ void random_neighbors(Lattice lat, int* z, int* i1, int* j1, int* i2, int* j2)
 }
 
 // Finds 2 random opposite neighbors and flips according to deltaE.
-void try_flip(Lattice lat)
+void try_flip(Lattice* lat)
 {
 	int z, i1, j1, i2, j2;
 	random_neighbors(lat, &z, &i1, &j1, &i2, &j2);
@@ -96,28 +101,28 @@ void try_flip(Lattice lat)
 		exchange_spin(lat, z, i1, j1, i2, j2);
 	}
 	else {
-		double exchange_prob = exp(-deltaE / lat.T);
+		double exchange_prob = exp(-deltaE / lat->T);
 		if (rand01() < exchange_prob)
 			exchange_spin(lat, z, i1, j1, i2, j2);
 	}
 }
 
 // Takes one (Monte-Carlo) step.
-void step(Lattice lat)
+void step(Lattice* lat)
 {
-	for (int i = 0; i < lat.Lz * lat.L * lat.L; i++)
+	for (int i = 0; i < lat->Lz * lat->L * lat->L; i++)
 		try_flip(lat);
 }
 
-void print_lattice(Lattice lat)
+void print_lattice(const Lattice* lat)
 {
 	printf("L = %i, Lz = %i\nT = %f, Jz = %f\n",
-		lat.L, lat.Lz, lat.T, lat.Jz);
+		lat->L, lat->Lz, lat->T, lat->Jz);
 
 	printf("Spin:\n");
-	for (int z = 1; z < lat.Lz+1; z++) {
-		for (int i = 1; i < lat.L+1; i++) {
-			for (int j = 1; j < lat.L+1; j++) {
+	for (int z = 1; z < lat->Lz+1; z++) {
+		for (int i = 1; i < lat->L+1; i++) {
+			for (int j = 1; j < lat->L+1; j++) {
 				char s = spin(lat, z, i, j) == 1 ? '1' : '0';
 				putchar(s);
 			}
@@ -128,7 +133,7 @@ void print_lattice(Lattice lat)
 }
 
 // Exports the lattice into a text file
-void export_lattice(Lattice lat, char* filepath)
+void export_lattice(const Lattice* lat, char* filepath)
 {	
     FILE* file = fopen(filepath, "w");
 	if (file == NULL)
@@ -136,12 +141,12 @@ void export_lattice(Lattice lat, char* filepath)
 
 	// Parameters
 	// fprintf(file, "L = %i, Lz = %i\nT = %f, Jz = %f\n",
-	// 	lat.L, lat.Lz, lat.T, lat.Jz);
+	// 	lat->L, lat->Lz, lat->T, lat->Jz);
 	
 	// Spin (excluding 0-spin boundary)
-	for (int z = 1; z < lat.Lz+1; z++) {
-		for (int i = 1; i < lat.L+1; i++) {
-			for (int j = 1; j < lat.L+1; j++) {
+	for (int z = 1; z < lat->Lz+1; z++) {
+		for (int i = 1; i < lat->L+1; i++) {
+			for (int j = 1; j < lat->L+1; j++) {
 				char c = spin(lat, z, i, j) == 1 ? '1' : '0';
 				fputc(c, file);
 			}

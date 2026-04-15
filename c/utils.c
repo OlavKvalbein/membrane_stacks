@@ -11,7 +11,7 @@ double rand01()
 }
 
 // random integer in [min, max]
-int rand_i_range(int min, int max)
+int rand_i(int min, int max)
 {
 	return rand() % (max - min + 1) + min;
 }
