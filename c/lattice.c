@@ -24,7 +24,6 @@ char spin(const Lattice* lat, int z, int i, int j)
 
 void reset_lattice(Lattice *lat)
 {
-	fill(lat, 0, lat->Lz+2, 0, lat->L+2, 0, lat->L+2, 0);
 	fill(lat, 1, lat->Lz+1, 1, lat->L+1, 1, lat->L+1, rand_i(0,1)*2 - 1);
 }
 
@@ -33,7 +32,8 @@ Lattice new_lattice(int L, int Lz, double T, double Jz)
 	char* spin = (char*)malloc((Lz+2)*(L+2)*(L+2)*sizeof(char));
 	Lattice lat = {L, Lz, T, Jz, spin};
 
-	reset_lattice(&lat);
+	fill(&lat, 0, Lz+2, 0, L+2, 0, L+2, 0);
+	fill(&lat, 1, Lz+1, 1, L+1, 1, L+1, rand_i(0,1)*2 - 1);
 
 	return lat;
 }
@@ -107,8 +107,8 @@ void try_flip(Lattice* lat)
 	}
 }
 
-// Takes one (Monte-Carlo) step.
-void step(Lattice* lat)
+// Takes one Monte-Carlo step.
+void do_step(Lattice* lat)
 {
 	for (int i = 0; i < lat->Lz * lat->L * lat->L; i++)
 		try_flip(lat);
