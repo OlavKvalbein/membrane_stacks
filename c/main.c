@@ -81,28 +81,30 @@ int main()
 {
 	srand(time(NULL));
 
-	int L = 16;
-	int Lz = 8;
+	int L = 64;
+	int Lz = 5;
 	double T = 1.5;
 	double Jz = 0.5;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
-	SamplingData sampling_data = {
-		.n_steps = 1000,
-		.n_samples = 100,
-		.burn_in_steps = 0,
-		.sample_specific_heat = true,
-		.sample_interconnectivity = false,
-	};
+	// SamplingData sampling_data = {
+	// 	.n_steps = 1000,
+	// 	.n_samples = 100,
+	// 	.burn_in_steps = 0,
+	// 	.sample_specific_heat = true,
+	// 	.sample_interconnectivity = false,
+	// };
 
-	run_ensemble(&lat, 10, &sampling_data);
+	// run_ensemble(&lat, 10, &sampling_data);
 
-	
+	export_lattice(&lat, "data/big_lattice/start");
 
-	// int steps = 100;
-	// for (int i = 0; i < steps; i++) {
-	// 	do_step(&lat);
-	// }
+	int steps = 1000;
+	for (int i = 0; i < steps; i++) {
+		do_step(&lat);
+	}
+
+	export_lattice(&lat, "data/big_lattice/end");
 
 	// char after_path[100];
 	// snprintf(after_path, sizeof(after_path),

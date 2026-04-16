@@ -4,7 +4,7 @@ import numpy as np
 L = 16
 Lz = 8
 
-filepath = "data/lattice_1000steps.txt"
+filepath = "data/.txt"
 
 spin = np.fromfile(filepath, dtype=np.int8, sep="").reshape((Lz, L, L))
 
