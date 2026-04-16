@@ -114,6 +114,12 @@ void do_step(Lattice* lat)
 		try_flip(lat);
 }
 
+void do_steps(Lattice* lat, int n)
+{
+	for (int i = 0; i < n; i++)
+		do_step(lat);
+}
+
 void print_lattice(const Lattice* lat)
 {
 	printf("L = %i, Lz = %i\nT = %f, Jz = %f\n",
