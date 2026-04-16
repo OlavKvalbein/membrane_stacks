@@ -99,7 +99,13 @@ int main()
 
 	export_lattice(&lat, "data/big_lattice/start");
 
-	int steps = 1000;
+	int steps = 500;
+	for (int i = 0; i < steps; i++) {
+		do_step(&lat);
+	}
+
+	export_lattice(&lat, "data/big_lattice/middle");
+
 	for (int i = 0; i < steps; i++) {
 		do_step(&lat);
 	}
