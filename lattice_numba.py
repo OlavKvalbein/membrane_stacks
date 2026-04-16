@@ -3,11 +3,11 @@ import numpy as np
 class Lattice():
     MAX_TRIES_SELECTING = 1000
 
-    def __init__(self, L, Lz, T_J_ratio, Jz_J_ratio):
+    def __init__(self, L, Lz, T, Jz):
         self.L = L
         self.Lz = Lz
-        self.J_T_ratio = 1/T_J_ratio
-        self.Jz_J_ratio = Jz_J_ratio
+        self.T = T
+        self.Jz = Jz
 
         self.rng = np.random.default_rng()
         self.spin = self.init_spin()
@@ -84,9 +84,4 @@ def lattice_series(L, Lz, T_J_ratio, Jz_J_ratio, MC_steps):
     return series
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    series = lattice_series(4, 3, 2.0, 0.1, 100)[::20]
-    fig, ax = plt.subplots(nrows=Lz, ncols=len(show_after_steps))
-    for (i, lattice) in enumerate(series):
-        ax[i].imshow(lattice)
-    plt.show()
+    pass

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from lattice import lattice_series
 
 def plot_series():
-    L = 20
-    Lz = 5
+    L = 10
+    Lz = 3
     T_J_ratio = 1.5
     Jz_J_ratio = 0.5
 
