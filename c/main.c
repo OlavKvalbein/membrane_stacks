@@ -82,7 +82,7 @@ int main()
 	srand(time(NULL));
 
 	int L = 64;
-	int Lz = 5;
+	int Lz = 32;
 	double T = 1.5;
 	double Jz = 0.5;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
@@ -97,20 +97,20 @@ int main()
 
 	// run_ensemble(&lat, 10, &sampling_data);
 
-	export_lattice(&lat, "data/big_lattice/start");
+	export_lattice(&lat, "data/big_lattice_Lz_32/start");
 
 	int steps = 500;
 	for (int i = 0; i < steps; i++) {
 		do_step(&lat);
 	}
 
-	export_lattice(&lat, "data/big_lattice/middle");
+	export_lattice(&lat, "data/big_lattice_Lz_32/middle");
 
 	for (int i = 0; i < steps; i++) {
 		do_step(&lat);
 	}
 
-	export_lattice(&lat, "data/big_lattice/end");
+	export_lattice(&lat, "data/big_lattice_Lz_32/end");
 
 	// char after_path[100];
 	// snprintf(after_path, sizeof(after_path),
