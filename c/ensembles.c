@@ -40,10 +40,10 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 	for (int i = 0; i < data->ensemble_size; i++) {
 		reset_lattice(lat);
 
-		// do the burn in steps
+		// burn in steps
 		do_steps(lat, data->burn_in_steps);
 
-		// sampling
+		// sampling steps
 		sample_lattice(lat, 0, data);
 		int sample_period = (data->n_steps - data->burn_in_steps)/data->n_samples;
 		for (int sample_nr = 1; sample_nr < data->n_samples; sample_nr++) {

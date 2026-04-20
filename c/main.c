@@ -31,16 +31,11 @@ int main()
 
 	// export_lattice(&lat, "data/big_lattice_Lz_32/start");
 
-	// int steps = 500;
-	// for (int i = 0; i < steps; i++) {
-	// 	do_step(&lat);
-	// }
+	// do_steps(&lat, 500);
 
 	// export_lattice(&lat, "data/big_lattice_Lz_32/middle");
 
-	// for (int i = 0; i < steps; i++) {
-	// 	do_step(&lat);
-	// }
+	// do_steps(&lat, 500);
 
 	// export_lattice(&lat, "data/big_lattice_Lz_32/end");
 }
