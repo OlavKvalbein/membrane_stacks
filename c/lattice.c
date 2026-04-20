@@ -84,7 +84,7 @@ void random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int* i2, int
 
 		// Only output if spins are opposite.
 		// This means points just inside the boundary are less likely to flip, which makes sense.
-		if (spin(lat, *z, *i1, *j2) == -spin(lat, *z, *i2, *j2))
+		if (spin(lat, *z, *i1, *j1) == -spin(lat, *z, *i2, *j2))
 			return;
 	}
 	printf("Failed to find random opposite neighbors.");

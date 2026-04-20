@@ -9,7 +9,7 @@ L = 64
 start_path  = "data/big_lattice_Lz_8_1m/start"
 middle_path = "data/big_lattice_Lz_8_1m/middle"
 end_path    = "data/big_lattice_Lz_8/end"
- 
+
 
 GREEN = "#2E8B2E"
 BROWN = "#C65A1E"
