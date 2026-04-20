@@ -10,10 +10,10 @@ int main()
 {
 	srand(time(NULL));
 
-	int L = 64;
+	int L = 16;
 	int Lz = 4;
-	double T = 1.5;
-	double Jz = 0.5;
+	double T = 0.00001;
+	double Jz = 0.0;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
 	// SamplingData sampling_data = {
@@ -32,6 +32,6 @@ int main()
 	export_lattice(&lat, "data/big_lattice/start");
 	do_steps(&lat, 100);
 	export_lattice(&lat, "data/big_lattice/middle");
-	do_steps(&lat, 200);
+	do_steps(&lat, 1e5);
 	export_lattice(&lat, "data/big_lattice/end");
 }
