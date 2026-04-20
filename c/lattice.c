@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "main.h"
 
@@ -66,44 +67,44 @@ double energy_diff(const Lattice* lat, int z, int i1, int j1, int i2, int j2)
 	return 2*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
 }
 
-// Finds 2 neighbors in the same plane.
-void random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int* i2, int* j2)
+// Finds 2 random neighbors in the same plane.
+// If opposite spin neighbors are found, then returns true
+bool opposite_random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int* i2, int* j2)
 {
-	int max_tries_selecting = lat->Lz * lat->L * lat->L * 10;
-	for (int i = 0; i < max_tries_selecting; i++) {		
-		// (z, i1, j1) is always in the interior, (z, i2, j2) not necessarily.
-		*z = rand_i(1, lat->Lz + 1);
-		*i1 = *i2 = rand_i(1, lat->L + 1);
-		*j1 = *j2 = rand_i(1, lat->L + 1);
+	// (z, i1, j1) is not on the 0-spin boundary, (z, i2, j2) is maybe.
+	*z = rand_i(1, lat->Lz + 1);
+	*i1 = *i2 = rand_i(1, lat->L + 1);
+	*j1 = *j2 = rand_i(1, lat->L + 1);
 
-		int offset = rand_i(0,1)*2 - 1;
-		if (rand01() < 0.5)
-			*i2 += offset;
-		else
-			*j2 += offset;
+	int offset = rand_i(0,1)*2 - 1;
+	if (rand01() < 0.5)
+		*i2 += offset;
+	else
+		*j2 += offset;
 
-		// Only output if spins are opposite.
-		// This means points just inside the boundary are less likely to flip, which makes sense.
-		if (spin(lat, *z, *i1, *j1) == -spin(lat, *z, *i2, *j2))
-			return;
-	}
-	printf("Failed to find random opposite neighbors.");
+	// Only output if spins are opposite.
+	// This means points just inside the boundary are less likely to exchange, which makes sense.
+	if (spin(lat, *z, *i1, *j1) == -spin(lat, *z, *i2, *j2))
+		return true;
+	else
+		return false;
 }
 
-// Finds 2 random opposite neighbors and flips according to deltaE.
+// Finds 2 random neighbors. If they are opposite spin, then flips according to deltaE.
 void try_flip(Lattice* lat)
 {
 	int z, i1, j1, i2, j2;
-	random_neighbors(lat, &z, &i1, &j1, &i2, &j2);
-
-	double deltaE = energy_diff(lat, z, i1, j1, i2, j2);
-	if (deltaE < 0) {
-		exchange_spin(lat, z, i1, j1, i2, j2);
-	}
-	else {
-		double exchange_prob = exp(-deltaE / lat->T);
-		if (rand01() < exchange_prob)
+	// if random neighbors are opposite:
+	if (opposite_random_neighbors(lat, &z, &i1, &j1, &i2, &j2)) {
+		double deltaE = energy_diff(lat, z, i1, j1, i2, j2);
+		if (deltaE < 0) {
 			exchange_spin(lat, z, i1, j1, i2, j2);
+		}
+		else {
+			double exchange_prob = exp(-deltaE / lat->T);
+			if (rand01() < exchange_prob)
+				exchange_spin(lat, z, i1, j1, i2, j2);
+		}
 	}
 }
 

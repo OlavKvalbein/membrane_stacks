@@ -30,12 +30,8 @@ int main()
 	// export_sampling_data(&sampling_data, "data/sampling.csv");
 
 	export_lattice(&lat, "data/big_lattice/start");
-
 	do_steps(&lat, 100);
-
 	export_lattice(&lat, "data/big_lattice/middle");
-
 	do_steps(&lat, 200);
-
 	export_lattice(&lat, "data/big_lattice/end");
 }
