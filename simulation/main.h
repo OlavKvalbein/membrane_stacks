@@ -18,7 +18,7 @@ typedef struct
 	int ensemble_size;
 	int n_steps;
 	int n_samples;
-	int burn_in_steps;	
+	int n_burn_in;	
 	
 	bool sample_specific_heat;
 	double* H;       // List of hamiltonian at each step

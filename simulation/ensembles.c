@@ -37,20 +37,33 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 {
 	init_sampling_data(data);
 
+	printf("Starting simulation. %i MC steps per ensemble member.\n", data->n_steps);
+	printf("Ensemble member %i/%i done...", 0, data->ensemble_size);
+
 	for (int i = 0; i < data->ensemble_size; i++) {
 		reset_lattice(lat);
 
 		// burn in steps
-		do_steps(lat, data->burn_in_steps);
+		do_steps(lat, data->n_burn_in);
 
 		// sampling steps
-		sample_lattice(lat, 0, data);
-		int sample_period = (data->n_steps - data->burn_in_steps)/data->n_samples;
-		for (int sample_nr = 1; sample_nr < data->n_samples; sample_nr++) {
-			do_steps(lat, sample_period);
-			sample_lattice(lat, sample_nr, data);
+		if (data->n_samples == 1) { // if taking only 1 sample, take the latest
+			do_steps(lat, data->n_steps);
+			sample_lattice(lat, 0, data);
 		}
+		else { // otherwise start at the beginning
+			sample_lattice(lat, 0, data);
+			int sample_period = (data->n_steps - data->n_burn_in)/data->n_samples;
+			for (int sample_nr = 1; sample_nr < data->n_samples; sample_nr++) {
+				do_steps(lat, sample_period);
+				sample_lattice(lat, sample_nr, data);
+			}
+		}
+		
+		// progress report
+		printf("\rEnsemble member %i/%i done...", i+1, data->ensemble_size);
 	}
+	putchar('\n');
 
 	// divide each sampled variable by ensemble size to get ensemble averages.
 	for (int i = 0; i < data->n_samples; i++) {
@@ -64,7 +77,7 @@ void export_sampling_data(const SamplingData* data, char* filepath)
     FILE* file = fopen(filepath, "w");
 
     fprintf(file, "# Ensemble size: %i, Steps: %i, Burn in steps: %i, Samples: %i\n",
-        data->ensemble_size, data->n_steps, data->burn_in_steps, data->n_samples);
+        data->ensemble_size, data->n_steps, data->n_burn_in, data->n_samples);
 
     if (data->sample_specific_heat)
         fprintf(file, "H,H^2");

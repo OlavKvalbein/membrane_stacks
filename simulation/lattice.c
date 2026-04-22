@@ -160,5 +160,5 @@ void export_lattice(const Lattice* lat, char* filepath)
 		}
 	}
     fclose(file);
-	printf("Exported file to %s\n", filepath);
+	printf("Exported lattice to %s\n", filepath);
 }
