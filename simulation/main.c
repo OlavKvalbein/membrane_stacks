@@ -10,9 +10,9 @@ int main()
 {
 	srand(time(NULL));
 
-	int L = 16;
-	int Lz = 4;
-	double T = 1.0;
+	int L = 32;
+	int Lz = 8;
+	double T = 1.63;
 	double Jz = 0.5;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
@@ -29,21 +29,21 @@ int main()
 
 	// export_sampling_data(&sampling_data, "data/sampling.csv");
 
-	export_lattice(&lat, "data/lattice/0");
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/0");
 	do_steps(&lat, 10);
-	export_lattice(&lat, "data/lattice/1");
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/1");
 	do_steps(&lat, 50);
-	export_lattice(&lat, "data/lattice/2");
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/2");
 	do_steps(&lat, 100);
-	export_lattice(&lat, "data/lattice/3");
-	do_steps(&lat, 500);
-	export_lattice(&lat, "data/lattice/4");
-	do_steps(&lat, 1000);
-	export_lattice(&lat, "data/lattice/5");
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/3");
 	do_steps(&lat, 5000);
-	export_lattice(&lat, "data/lattice/6");
-	do_steps(&lat, 10'000);
-	export_lattice(&lat, "data/lattice/7");
-	do_steps(&lat, 50'000);
-	export_lattice(&lat, "data/lattice/8");
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/4");
+	do_steps(&lat, 10000);
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/5");
+	do_steps(&lat, 50000);
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/6");
+	do_steps(&lat, 100000);
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/7");
+	do_steps(&lat, 1000000);
+	export_lattice(&lat, "data/lattice32_T=1.63_0.5/8");
 }

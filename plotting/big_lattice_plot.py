@@ -4,16 +4,14 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib.colors import to_rgba
  
-L = 64
+L = 16
  
-start_path  = "data/big_lattice_Lz_8_1m/start"
-middle_path = "data/big_lattice_Lz_8_1m/middle"
-end_path    = "data/big_lattice_Lz_8/end"
 
 
 GREEN = "#2E8B2E"
 BROWN = "#C65A1E"
-LAYER_SPACING = 3.0     # vertical spacing between layers in the plot
+LAYER_SPACING = 1.0     # vertical spacing between layers in the plot
+LAYER_THICKNESS = 0.8   # how fat each layer is; must be <= LAYER_SPACING
 ALPHA = 1.0             # layer opacity (1.0 = solid)
 CELL_EDGE = False       # set True for cell-level gridlines (slow)
  
@@ -44,15 +42,23 @@ def _merge_cells_to_rects(mask):
     return rects
  
  
-def _rects_to_polys(rects, z):
-
-    polys = np.empty((len(rects), 4, 3), dtype=float)
-    for i, (x0, y0, x1, y1) in enumerate(rects):
-        polys[i, 0] = (x0, y0, z)
-        polys[i, 1] = (x1, y0, z)
-        polys[i, 2] = (x1, y1, z)
-        polys[i, 3] = (x0, y1, z)
-    return polys
+def _rects_to_boxes(rects, z, thickness):
+    """Convert 2D rects to 3D box polygons (6 faces each) centered at height z."""
+    z0 = z - thickness / 2
+    z1 = z + thickness / 2
+    # Each rect -> 6 quads (top, bottom, 4 sides). We return shape (n_rects*6, 4, 3).
+    boxes = np.empty((len(rects) * 6, 4, 3), dtype=float)
+    for k, (x0, y0, x1, y1) in enumerate(rects):
+        b = k * 6
+        # top (z1) and bottom (z0)
+        boxes[b+0] = [(x0,y0,z1), (x1,y0,z1), (x1,y1,z1), (x0,y1,z1)]
+        boxes[b+1] = [(x0,y0,z0), (x1,y0,z0), (x1,y1,z0), (x0,y1,z0)]
+        # sides
+        boxes[b+2] = [(x0,y0,z0), (x1,y0,z0), (x1,y0,z1), (x0,y0,z1)]
+        boxes[b+3] = [(x0,y1,z0), (x1,y1,z0), (x1,y1,z1), (x0,y1,z1)]
+        boxes[b+4] = [(x0,y0,z0), (x0,y1,z0), (x0,y1,z1), (x0,y0,z1)]
+        boxes[b+5] = [(x1,y0,z0), (x1,y1,z0), (x1,y1,z1), (x1,y0,z1)]
+    return boxes
  
  
 def plot_stacked_layers(ax, lattice, spacing=LAYER_SPACING, title=""):
@@ -73,7 +79,7 @@ def plot_stacked_layers(ax, lattice, spacing=LAYER_SPACING, title=""):
         h = z * spacing
  
         if up_rects:
-            up_polys = _rects_to_polys(up_rects, h)
+            up_polys = _rects_to_boxes(up_rects, h, LAYER_THICKNESS)
             pc = Poly3DCollection(
                 up_polys,
                 facecolors=green_rgba,
@@ -83,7 +89,7 @@ def plot_stacked_layers(ax, lattice, spacing=LAYER_SPACING, title=""):
             ax.add_collection3d(pc)
  
         if down_rects:
-            down_polys = _rects_to_polys(down_rects, h)
+            down_polys = _rects_to_boxes(down_rects, h, LAYER_THICKNESS)
             pc = Poly3DCollection(
                 down_polys,
                 facecolors=brown_rgba,
@@ -105,23 +111,33 @@ def plot_stacked_layers(ax, lattice, spacing=LAYER_SPACING, title=""):
  
  
 if __name__ == "__main__":
-    start  = load_lattice(start_path)
-    middle = load_lattice(middle_path)
-    #end    = load_lattice(end_path)
- 
-    print(f"shapes: start={start.shape}, middle={middle.shape}")
- 
-    # 1 row x 3 cols
-    fig = plt.figure(figsize=(18, 6))
-    ax1 = fig.add_subplot(1, 3, 1, projection='3d')
-    ax2 = fig.add_subplot(1, 3, 2, projection='3d')
-    #ax3 = fig.add_subplot(1, 3, 3, projection='3d')
- 
-    plot_stacked_layers(ax1, start,  title="0 MCS")
-    plot_stacked_layers(ax2, middle, title="500000 MCS")
-    #plot_stacked_layers(ax3, end,    title="10000 MCS")
- 
+    base = "data/lattice32_T=1.63_0.5"   # one place to set the folder
+    snapshots = [
+        (f"{base}/0", "10 MCS"),
+        (f"{base}/1", "50 MCS"),
+        (f"{base}/2", "100 MCS"),
+        (f"{base}/3", "5000 MCS"),
+        (f"{base}/4", "10000 MCS"),
+        (f"{base}/5", "50000 MCS"),
+        (f"{base}/6", "100000 MCS"),
+        (f"{base}/7", "1000000 MCS"),
+    ]
+
+    # Load all lattices
+    lattices = [(load_lattice(path), title) for path, title in snapshots]
+    for lat, title in lattices:
+        print(f"{title}: shape={lat.shape}")
+
+    # 2 rows x 4 cols
+    nrows, ncols = 2, 4
+    fig = plt.figure(figsize=(5 * ncols, 4 * nrows))
+    for idx, (lat, title) in enumerate(lattices):
+        ax = fig.add_subplot(nrows, ncols, idx + 1, projection='3d')
+        plot_stacked_layers(ax, lat, title=title)
+    T = 1.63
+    Jz = 0.1
+    fig.suptitle(f"T = {T}, $J_z$ = {Jz}", fontsize=14, y=0.98)
     plt.tight_layout()
-    plt.savefig("figures/lattice_stacked.png", dpi=150, bbox_inches='tight')
+    plt.savefig("figures/lattice32_T=1.63_Jz=0.5.png", dpi=150, bbox_inches='tight')
     plt.show()
  
