@@ -11,8 +11,8 @@ int main()
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
 	SamplingData sampling_data = {
-		.ensemble_size = 5,
-		.n_steps = 1'000'000,
+		.ensemble_size = 100,
+		.n_steps = 100'000,
 		.n_samples = 100,
 		.n_burn_in = 0,
 		.sample_specific_heat = true,
@@ -20,7 +20,7 @@ int main()
 	};
 
 	// ensemble averages at different temperatures
-	double Ts[] = {1.0, 1.125, 1.25};
+	double Ts[] = {2.0,2.5,3.0,3.5,4.0,4.5,5.0};
 	char filepath[200];
 	for (int i = 0; i < sizeof(Ts)/sizeof(double); i++) {
 		lat.T = Ts[i];
