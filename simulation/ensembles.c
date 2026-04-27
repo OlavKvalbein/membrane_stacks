@@ -8,6 +8,10 @@ void init_sampling_data(SamplingData* data)
 	if (data->sample_specific_heat) {
 		data->H = (double*)malloc(data->n_samples*sizeof(double));
 		data->H_sq = (double*)malloc(data->n_samples*sizeof(double));
+		for (int i = 0; i < data->n_samples; i++) {
+			data->H[i] = 0;
+			data->H_sq[i] = 0;
+		}
 	}
 
 	if (data->sample_interconnectivity) {
@@ -81,11 +85,12 @@ void export_sampling_data(const SamplingData* data, char* filepath)
 
 	// data
     for (int i = 0; i < data->n_samples; i++) {
-		fprintf(file, "%i,", data->n_burn_in + i*data->sample_period);
+		int step = data->n_burn_in + i*data->sample_period;
+		fprintf(file, "%i,", step);
 
         if (data->sample_specific_heat)
             fprintf(file, "%f,%f,", data->H[i], data->H_sq[i]);
-			
+
         if (data->sample_interconnectivity)
             ;// TODO
         
