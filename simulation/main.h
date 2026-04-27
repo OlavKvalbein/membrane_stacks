@@ -1,6 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include <stdbool.h>
+
 double rand01();
 int rand_i(int min, int max);
 
@@ -18,7 +24,9 @@ typedef struct
 	int ensemble_size;
 	int n_steps;
 	int n_samples;
-	int n_burn_in;	
+	int n_burn_in;
+
+	int sample_period;
 	
 	bool sample_specific_heat;
 	double* H;       // List of hamiltonian at each step

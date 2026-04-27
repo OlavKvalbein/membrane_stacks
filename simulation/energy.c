@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 int sum1(const Lattice* lat)

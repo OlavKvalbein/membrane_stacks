@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 int main()
@@ -18,7 +12,7 @@ int main()
 
 	SamplingData sampling_data = {
 		.ensemble_size = 50,
-		.n_steps = 1000000,
+		.n_steps = 1000,
 		.n_samples = 100,
 		.n_burn_in = 0,
 		.sample_specific_heat = true,

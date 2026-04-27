@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 void set_spin(Lattice* lat, int z, int i, int j, char val)
