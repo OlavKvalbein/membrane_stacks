@@ -10,7 +10,7 @@
 double rand01();
 int rand_i(int min, int max);
 
-typedef struct
+typedef struct Lattice
 {
 	int L;
 	int Lz;
@@ -19,7 +19,7 @@ typedef struct
 	char *spin;
 } Lattice;
 
-typedef struct
+typedef struct SamplingData
 {
 	int ensemble_size;
 	int n_steps;
