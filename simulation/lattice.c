@@ -71,11 +71,16 @@ bool opposite_random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int
 	*i1 = *i2 = rand_i(1, lat->L + 1);
 	*j1 = *j2 = rand_i(1, lat->L + 1);
 
-	int offset = rand_i(0,1)*2 - 1;
-	if (rand01() < 0.5)
-		*i2 += offset;
+	// choose a random offset
+	int direction = rand() % 4;
+	if (direction == 0)
+		*i2 += 1;
+	else if (direction == 1)
+		*i2 -= 1;
+	else if (direction == 2)
+		*j2 += 1;
 	else
-		*j2 += offset;
+		*j2 -= 1;
 
 	// Only output if spins are opposite.
 	// This means points just inside the boundary are less likely to exchange, which makes sense.
