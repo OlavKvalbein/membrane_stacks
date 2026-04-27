@@ -42,6 +42,8 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 	printf("Starting simulation. %i MC steps per ensemble member.\n", data->n_steps);
 	printf("Ensemble member %i/%i done...", 0, data->ensemble_size);
 
+	clock_t start_time = clock();
+
 	for (int i = 0; i < data->ensemble_size; i++) {
 		reset_lattice(lat);
 
@@ -58,13 +60,15 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 		// progress report
 		printf("\rEnsemble member %i/%i done...", i+1, data->ensemble_size);
 	}
-	putchar('\n');
-
+	
 	// divide each sampled variable by ensemble size to get ensemble averages.
 	for (int i = 0; i < data->n_samples; i++) {
 		data->H[i] /= data->ensemble_size;
 		data->H_sq[i] /= data->ensemble_size;
 	}
+	
+	printf("\nTime used: %Lf sec.\n",
+		(double)(clock() - start_time) / CLOCKS_PER_SEC);
 }
 
 void export_sampling_data(const SamplingData* data, char* filepath)
