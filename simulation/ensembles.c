@@ -66,8 +66,8 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 		data->H[i] /= data->ensemble_size;
 		data->H_sq[i] /= data->ensemble_size;
 	}
-	
-	printf("\nTime used: %Lf sec.\n",
+
+	printf("\nTime used: %f sec.\n",
 		(double)(clock() - start_time) / CLOCKS_PER_SEC);
 }
 
@@ -101,5 +101,6 @@ void export_sampling_data(const SamplingData* data, char* filepath)
         putc('\n', file);
     }
 
+	fclose(file);
     printf("Exported sampling data to %s\n", filepath);
 }
