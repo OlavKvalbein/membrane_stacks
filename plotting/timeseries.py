@@ -27,7 +27,9 @@ def read_different_Ts(folderpath):
 
 if __name__ == "__main__":
     # Plots the energy at the different temperatures
-    Ts, steps, Hs, _ = read_different_Ts("data/timeseries/L=8,Lz=4")
+    # folderpath = "data/timeseries/L=8,Lz=4"
+    folderpath = "data/timeseries/L=16,Lz=8"
+    Ts, steps, Hs, _ = read_different_Ts(folderpath)
 
     for i in range(len(Ts)):
         plt.plot(steps[i], Hs[i], label=f"T = {Ts[i]}")

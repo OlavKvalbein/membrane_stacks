@@ -34,22 +34,23 @@ int main()
 	Lattice lat = new_lattice(L, Lz, 0.0, Jz);
 
 	SamplingData sampling_data = {
-		.n_steps = 10'000,
-		.ensemble_size = 100,
-		.n_samples = 100,
+		.n_steps = 15'000,
+		.ensemble_size = 10,
+		.n_samples = 200,
 		.n_burn_in = 0,
 		.sample_specific_heat = true,
 		.sample_interconnectivity = false,
 	};
 
-	char folder[] = "data/energy_timeseries/L=16,Lz=8";
-	double T1[] = {2.0,2.125,2.25,2.375,2.5};
-	double T2[] = {2.625,2.75,3.0,3.25,3.5};
-
+	char folder[] = "data/timeseries/L=16,Lz=8";
+	double T1[] = {1.5,1.625,1.75,1.875,2.0,2.125,2.25,2.375,2.5};
+	
 	many_timeseries(folder, T1, len(T1), &lat, &sampling_data);
+
+	// double T2[] = {2.625,2.75,3.0,3.25,3.5};
 	// lower temperatures don't need to run as far to equilibriate.
-	sampling_data.n_steps = 5'000;
-	many_timeseries(folder, T2, len(T2), &lat, &sampling_data);
+	// sampling_data.n_steps = 5'000;
+	// many_timeseries(folder, T2, len(T2), &lat, &sampling_data);
 
 
 	printf("\nTotal program runtime: %.2f min.\n",
