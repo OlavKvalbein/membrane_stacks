@@ -21,7 +21,7 @@ def read_for_Ts(folderpath):
         Hs.append(df["H"])
     return (Ts, Hs, steps)
 
-Ts, Hs, steps = read_for_Ts("data/energy_timeseries/2")
+Ts, Hs, steps = read_for_Ts("data/energy_timeseries/4")
 
 for i in range(len(Ts)):
     plt.plot(steps, Hs[i], label=f"T = {Ts[i]}")
