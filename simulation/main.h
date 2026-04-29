@@ -10,6 +10,7 @@
 
 double rand01();
 int rand_i(int min, int max);
+double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
 
 typedef struct Lattice
@@ -31,11 +32,11 @@ typedef struct SamplingData
 	int sample_period;
 	
 	bool sample_specific_heat;
-	double* H;       // List of hamiltonian at each step
-	double* H_sq;	// List of hamiltonian^2 at each step
+	double* H;		// List of hamiltonian at each step
+	double* H2;		// List of hamiltonian^2 at each step
 
-	bool sample_interconnectivity; // delta^2. TODO
-	// something for delta^2
+	bool sample_delta2; // delta^2.
+	double* delta2;
 } SamplingData;
 
 Lattice new_lattice(int L, int Lz, double T, double Jz);
@@ -47,6 +48,7 @@ char nesw_sum(const Lattice* lat, int z, int i, int j);
 char spin(const Lattice* lat, int z, int i, int j);
 
 double energy(const Lattice* lat);
+double delta2(const Lattice* lat);
 
 void run_ensemble(Lattice* lat, SamplingData* data);
 void export_sampling_data(const SamplingData* data, const Lattice* lat, char* filepath);

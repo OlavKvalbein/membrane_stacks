@@ -11,3 +11,8 @@ int rand_i(int min, int max)
 {
 	return rand() % (max - min + 1) + min;
 }
+
+double lerp(double a, double b, double t)
+{
+	return (b - a) * t + a;
+}

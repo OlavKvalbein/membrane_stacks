@@ -7,15 +7,18 @@ void init_sampling_data(SamplingData* data)
 
 	if (data->sample_specific_heat) {
 		data->H = (double*)malloc(data->n_samples*sizeof(double));
-		data->H_sq = (double*)malloc(data->n_samples*sizeof(double));
+		data->H2 = (double*)malloc(data->n_samples*sizeof(double));
 		for (int i = 0; i < data->n_samples; i++) {
 			data->H[i] = 0;
-			data->H_sq[i] = 0;
+			data->H2[i] = 0;
 		}
 	}
 
-	if (data->sample_interconnectivity) {
-		// TODO
+	if (data->sample_delta2) {
+		data->delta2 = (double*)malloc(data->n_samples*sizeof(double));
+		for (int i = 0; i < data->n_samples; i++) {
+			data->delta2[i] = 0;
+		}
 	}
 }
 
@@ -26,11 +29,11 @@ void sample_lattice(const Lattice* lat, int sample_nr, SamplingData* data)
 	if (data->sample_specific_heat) {
 		double hamil = energy(lat);
 		data->H[sample_nr] += hamil; 
-		data->H_sq[sample_nr] += hamil*hamil;
+		data->H2[sample_nr] += hamil*hamil;
 	}
 
-	if (data->sample_interconnectivity) {
-		// TODO
+	if (data->sample_delta2) {
+		data->delta2[sample_nr] += delta2(lat);
 	}
 }
 
@@ -64,7 +67,8 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 	// divide each sampled variable by ensemble size to get ensemble averages.
 	for (int i = 0; i < data->n_samples; i++) {
 		data->H[i] /= data->ensemble_size;
-		data->H_sq[i] /= data->ensemble_size;
+		data->H2[i] /= data->ensemble_size;
+		data->delta2[i] /= data->ensemble_size;
 	}
 
 	printf("\nTime used: %f sec.\n",
@@ -84,9 +88,9 @@ void export_sampling_data(const SamplingData* data, const Lattice* lat, char* fi
 	// headers
 	fprintf(file, "step,");
     if (data->sample_specific_heat)
-        fprintf(file, "H,H^2");
-    if (data->sample_interconnectivity)
-        ;//TODO
+        fprintf(file, "H,H^2,");
+    if (data->sample_delta2)
+        fprintf(file, "delta^2,");
     putc('\n', file);
 
 	// data
@@ -95,10 +99,10 @@ void export_sampling_data(const SamplingData* data, const Lattice* lat, char* fi
 		fprintf(file, "%i,", step);
 
         if (data->sample_specific_heat)
-            fprintf(file, "%f,%f,", data->H[i], data->H_sq[i]);
+            fprintf(file, "%f,%f,", data->H[i], data->H2[i]);
 
-        if (data->sample_interconnectivity)
-            ;// TODO
+        if (data->sample_delta2)
+            fprintf(file, "%f,", data->delta2[i]);
         
         putc('\n', file);
     }
