@@ -10,6 +10,7 @@
 
 double rand01();
 int rand_i(int min, int max);
+#define len(arr) (sizeof(arr)/sizeof(arr[0]))
 
 typedef struct Lattice
 {
