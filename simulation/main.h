@@ -6,6 +6,7 @@
 #include <time.h>
 #include <math.h>
 #include <stdbool.h>
+#include <string.h>
 
 double rand01();
 int rand_i(int min, int max);
@@ -47,7 +48,7 @@ char spin(const Lattice* lat, int z, int i, int j);
 double energy(const Lattice* lat);
 
 void run_ensemble(Lattice* lat, SamplingData* data);
-void export_sampling_data(const SamplingData* data, char* filepath);
+void export_sampling_data(const SamplingData* data, const Lattice* lat, char* filepath);
 
 
 #endif

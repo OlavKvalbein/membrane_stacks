@@ -71,13 +71,15 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 		(double)(clock() - start_time) / CLOCKS_PER_SEC);
 }
 
-void export_sampling_data(const SamplingData* data, char* filepath)
+void export_sampling_data(const SamplingData* data, const Lattice* lat, char* filepath)
 {
     FILE* file = fopen(filepath, "w");
 
 	// metadata
     fprintf(file, "# Ensemble size: %i, Steps: %i, Burn in steps: %i, Samples: %i\n",
         data->ensemble_size, data->n_steps, data->n_burn_in, data->n_samples);
+	fprintf(file, "# L = %i, Lz = %i, T = %.3f, Jz = %.4f\n",
+		lat->L, lat->Lz, lat->T, lat->Jz);
 
 	// headers
 	fprintf(file, "step,");
