@@ -28,8 +28,8 @@ int main()
 	clock_t start_time = clock();
 	srand(time(NULL));
 
-	int L = 8;
-	int Lz = 4;
+	int L = 16;
+	int Lz = 8;
 	double Jz = 0.1;
 	Lattice lat = new_lattice(L, Lz, 0.0, Jz);
 
@@ -42,7 +42,7 @@ int main()
 		.sample_interconnectivity = false,
 	};
 
-	char folder[] = "data/energy_timeseries";
+	char folder[] = "data/energy_timeseries/L=16,Lz=8";
 	double T1[] = {2.0,2.125,2.25,2.375,2.5};
 	double T2[] = {2.625,2.75,3.0,3.25,3.5};
 
