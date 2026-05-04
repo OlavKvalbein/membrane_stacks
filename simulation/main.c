@@ -34,7 +34,7 @@ int main()
 	Lattice lat = new_lattice(L, Lz, 1.5, Jz);
 
 	SamplingData sampling_data = {
-		.n_steps = 10'000,
+		.n_steps = 10000,
 		.ensemble_size = 1,
 		.n_samples = 200,
 		.n_burn_in = 0,
