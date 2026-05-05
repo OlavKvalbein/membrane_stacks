@@ -30,11 +30,12 @@ int main()
 
 	int L = 16;
 	int Lz = 8;
-	double Jz = 0.1;
-	Lattice lat = new_lattice(L, Lz, 1.5, Jz);
+	double Jz = 1.0;
+	double T = 2.0;
+	Lattice lat = new_lattice(L, Lz, T, Jz);
 
 	SamplingData sampling_data = {
-		.n_steps = 10000,
+		.n_steps = 1e5,
 		.ensemble_size = 1,
 		.n_samples = 200,
 		.n_burn_in = 0,
@@ -57,7 +58,7 @@ int main()
 	// many_timeseries(folder, T2, len(T2), &lat, &sampling_data);
 	run_ensemble(&lat, &sampling_data);
 	export_sampling_data(&sampling_data, &lat,
-		"data/timeseries/delta2.csv");
+		"data/timeseries/test.csv");
 
 	printf("\nTotal program runtime: %.2f min.\n",
 		(double)(clock() - start_time) / (CLOCKS_PER_SEC * 60));

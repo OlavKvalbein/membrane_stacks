@@ -77,36 +77,36 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 
 void export_sampling_data(const SamplingData* data, const Lattice* lat, char* filepath)
 {
-    FILE* file = fopen(filepath, "w");
+	FILE* file = fopen(filepath, "w");
 
 	// metadata
-    fprintf(file, "# Ensemble size: %i, Steps: %i, Burn in steps: %i, Samples: %i\n",
-        data->ensemble_size, data->n_steps, data->n_burn_in, data->n_samples);
+	fprintf(file, "# Ensemble size: %i, Steps: %i, Burn in steps: %i, Samples: %i\n",
+		data->ensemble_size, data->n_steps, data->n_burn_in, data->n_samples);
 	fprintf(file, "# L = %i, Lz = %i, T = %.3f, Jz = %.4f\n",
 		lat->L, lat->Lz, lat->T, lat->Jz);
 
 	// headers
 	fprintf(file, "step,");
-    if (data->sample_specific_heat)
-        fprintf(file, "H,H^2,");
-    if (data->sample_delta2)
-        fprintf(file, "delta^2,");
-    putc('\n', file);
+	if (data->sample_specific_heat)
+		fprintf(file, "H,H^2,");
+	if (data->sample_delta2)
+		fprintf(file, "delta^2,");
+	putc('\n', file);
 
 	// data
-    for (int i = 0; i < data->n_samples; i++) {
+	for (int i = 0; i < data->n_samples; i++) {
 		int step = data->n_burn_in + i*data->sample_period;
 		fprintf(file, "%i,", step);
 
-        if (data->sample_specific_heat)
-            fprintf(file, "%f,%f,", data->H[i], data->H2[i]);
+		if (data->sample_specific_heat)
+			fprintf(file, "%f,%f,", data->H[i], data->H2[i]);
 
-        if (data->sample_delta2)
-            fprintf(file, "%f,", data->delta2[i]);
-        
-        putc('\n', file);
-    }
+		if (data->sample_delta2)
+			fprintf(file, "%f,", data->delta2[i]);
+		
+		putc('\n', file);
+	}
 
 	fclose(file);
-    printf("Exported sampling data to %s\n", filepath);
+	printf("Exported sampling data to %s\n", filepath);
 }
