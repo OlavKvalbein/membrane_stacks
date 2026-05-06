@@ -28,9 +28,9 @@ int main()
 	clock_t start_time = clock();
 	srand(time(NULL));
 
-	int L = 16;
+	int L = 64;
 	int Lz = 8;
-	double Jz = 0.5;
+	double Jz = 1.0;
 	double T = 2.0;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 

@@ -106,9 +106,15 @@ void try_flip(Lattice* lat) {
         char U1 = spin(lat, zup, i1, j1) + spin(lat, zdn, i1, j1);
         char U2 = spin(lat, zup, i2, j2) + spin(lat, zdn, i2, j2);
 
-        double prob = boltzmann_factor(lat, s, N1, N2, U1, U2);
-        if (rand01() < prob)
-            exchange_spin(lat, z, i1, j1, i2, j2);
+		// table lookup version
+        // double prob = boltzmann_factor(lat, s, N1, N2, U1, U2);
+        // if (rand01() < prob)
+        //     exchange_spin(lat, z, i1, j1, i2, j2);
+
+		// directly compute version, actually faster
+		double dE = 2.0*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
+		if (dE < 0 || rand01() < exp(-dE / lat->T))
+    		exchange_spin(lat, z, i1, j1, i2, j2);
     }
 }
 
