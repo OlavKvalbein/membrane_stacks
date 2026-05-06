@@ -21,21 +21,17 @@ static inline uint fast_rand() {
 double rand01();
 double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
-#define swap(arr, i, j) ({		\
-	int temp = (arr)[i];		\
-	(arr)[i] = (arr)[j];		\
-	(arr)[j] = temp;			\
-})
 
-typedef struct Lattice
+// should both be divisible by 2
+#define L 64
+#define Lz 8
+
+typedef struct
 {
-	int L;
-	int Lz;
 	double T;		// corresponds to T/J
 	double Jz;		// corresponds to Jz/J
 	
-	char *spin;
-	int len;
+	char spin[Lz][L][L];
 	// The boltzmann factors, i.e. the possible exchange probabilities.
 	double boltzmann_table[2][9][9];
 } Lattice;
@@ -57,16 +53,12 @@ typedef struct SamplingData
 	double* delta2;
 } SamplingData;
 
-Lattice new_lattice(int L, int Lz, double T, double Jz);
+Lattice new_lattice(double T, double Jz);
 void reset_spin(Lattice *lat);
 void print_lattice(const Lattice* lat);
 void export_lattice(const Lattice* lat, char* filepath);
 void do_steps(Lattice* lat, int n);
 char nesw_sum(const Lattice* lat, int z, int i, int j);
-static inline char spin(const Lattice* lat, int z, int i, int j)
-{
-    return lat->spin[z * lat->L * lat->L + i * lat->L + j];
-}
 
 double energy(const Lattice* lat);
 double delta2(const Lattice* lat);

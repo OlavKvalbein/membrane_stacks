@@ -1,41 +1,40 @@
 #include "main.h"
 
-// exports 1 csv file
-void timeseries(char* folderpath, Lattice* lat, SamplingData* data)
-{
-	run_ensemble(lat, data);
+// // exports 1 csv file
+// void timeseries(char* folderpath, Lattice* lat, SamplingData* data)
+// {
+// 	run_ensemble(lat, data);
 
-	char filepath[500];
-	// take the temperature as the file name.
-	snprintf(filepath, sizeof(filepath), "%s/T=%1.3f.csv",
-		folderpath, lat->T);
-	export_sampling_data(data, lat, filepath);
-}
+// 	char filepath[500];
+// 	// take the temperature as the file name.
+// 	snprintf(filepath, sizeof(filepath), "%s/T=%1.3f.csv",
+// 		folderpath, lat->T);
+// 	export_sampling_data(data, lat, filepath);
+// }
 
-// exports 1 csv file for each temperature.
-// Takes an initial lattice and samplingdata
-void many_timeseries(char* folderpath, double* T, int length,
-	Lattice* lat, SamplingData* data)
-{
-	for (int i = 0; i < length; i++) {
-		lat->T = T[i];
-		timeseries(folderpath, lat, data);
-	}
-}
+// // exports 1 csv file for each temperature.
+// // Takes an initial lattice and samplingdata
+// void many_timeseries(char* folderpath, double* T, int length,
+// 	Lattice* lat, SamplingData* data)
+// {
+// 	for (int i = 0; i < length; i++) {
+// 		lat->T = T[i];
+// 		timeseries(folderpath, lat, data);
+// 	}
+// }
 
 int main()
 {
 	clock_t start_time = clock();
-	srand(time(NULL));
+	// srand(time(NULL));
+	rng_state = 12345;
 
-	int L = 64;
-	int Lz = 8;
-	double Jz = 1.0;
+	double Jz = 0.5;
 	double T = 2.0;
-	Lattice lat = new_lattice(L, Lz, T, Jz);
+	Lattice lat = new_lattice(T, Jz);
 
 	export_lattice(&lat, "data/lattices/test1");
-	do_steps(&lat, 1e5);
+	do_steps(&lat, 1e7);
 	export_lattice(&lat, "data/lattices/test2");
 
 	// SamplingData sampling_data = {
