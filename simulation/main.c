@@ -28,14 +28,14 @@ int main()
 	clock_t start_time = clock();
 	srand(time(NULL));
 
-	int L = 32;
+	int L = 16;
 	int Lz = 8;
-	double Jz = 1.0;
+	double Jz = 0.5;
 	double T = 2.0;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
 	export_lattice(&lat, "data/lattices/test1");
-	do_steps(&lat, 10000);
+	do_steps(&lat, 1e5);
 	export_lattice(&lat, "data/lattices/test2");
 
 	// SamplingData sampling_data = {

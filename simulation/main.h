@@ -8,8 +8,17 @@
 #include <stdbool.h>
 #include <string.h>
 
+typedef unsigned int uint;
+
+static uint rng_state = 12345;
+
+static inline uint fast_rand() {
+    rng_state ^= rng_state << 13;
+    rng_state ^= rng_state >> 17;
+    rng_state ^= rng_state << 5;
+    return rng_state;
+}
 double rand01();
-int rand_i(int min, int max);
 double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
 #define swap(arr, i, j) ({		\
@@ -24,8 +33,11 @@ typedef struct Lattice
 	int Lz;
 	double T;		// corresponds to T/J
 	double Jz;		// corresponds to Jz/J
+	
 	char *spin;
 	int len;
+	// The boltzmann factors, i.e. the possible exchange probabilities.
+	double boltzmann_table[2][9][9];
 } Lattice;
 
 typedef struct SamplingData
@@ -46,12 +58,15 @@ typedef struct SamplingData
 } SamplingData;
 
 Lattice new_lattice(int L, int Lz, double T, double Jz);
-void reset_lattice(Lattice *lat);
+void reset_spin(Lattice *lat);
 void print_lattice(const Lattice* lat);
 void export_lattice(const Lattice* lat, char* filepath);
 void do_steps(Lattice* lat, int n);
 char nesw_sum(const Lattice* lat, int z, int i, int j);
-char spin(const Lattice* lat, int z, int i, int j);
+static inline char spin(const Lattice* lat, int z, int i, int j)
+{
+    return lat->spin[z * lat->L * lat->L + i * lat->L + j];
+}
 
 double energy(const Lattice* lat);
 double delta2(const Lattice* lat);

@@ -1,16 +1,27 @@
 #include "main.h"
 
+void precompute_boltzmann_table(Lattice* lat) {
+    for (int s = -1; s <= 1; s += 2)
+    for (int dN = -8; dN <= 8; dN += 2)   // N1-N2
+    for (int dU = -4; dU <= 4; dU++) {     // U1-U2
+        double dE = 2.0*s*(dN + 2*s + lat->Jz*dU);
+        double factor = (dE < 0) ? 1.0 : exp(-dE / lat->T);
+        lat->boltzmann_table[(s+1)/2][(dN+8)/2][dU+4] = factor;
+    }
+}
+
+static inline double boltzmann_factor(const Lattice* lat,
+                                       char s, char N1, char N2,
+                                       char U1, char U2) {
+    return lat->boltzmann_table[(s+1)/2][(N1-N2+8)/2][U1-U2+4];
+}
+
 void set_spin(Lattice* lat, int z, int i, int j, char val)
 {
 	lat->spin[z*lat->L*lat->L + i*lat->L + j] = val; 
 }
 
-char spin(const Lattice* lat, int z, int i, int j)
-{
-	return lat->spin[z*lat->L*lat->L + i*lat->L + j];
-}
-
-void reset_lattice(Lattice *lat)
+void reset_spin(Lattice *lat)
 {
 	// fill the spin array with 1's and -1's.
 	int half = lat->len / 2;
@@ -21,7 +32,7 @@ void reset_lattice(Lattice *lat)
 
 	// Fisher-Yates shuffle
 	for (int i = lat->len - 1; i > 0; i--) {
-		int j = rand_i(0, i);
+		int j = fast_rand() % (i + 1);
 
 		swap(lat->spin, i, j);
 	}
@@ -30,13 +41,12 @@ void reset_lattice(Lattice *lat)
 Lattice new_lattice(int L, int Lz, double T, double Jz)
 {
 	char* spin = (char*)malloc(Lz*L*L*sizeof(char));
-	Lattice lat = {L, Lz, T, Jz, spin, L*L*Lz};
+	Lattice lat = {L, Lz, T, Jz, spin, .len=L*L*Lz};
+	precompute_boltzmann_table(&lat);
 
-	reset_lattice(&lat);
-
+	reset_spin(&lat);
 	return lat;
 }
-
 
 // Assumes spins at (z, i1, j1) and (z, i2, j2) are opposite
 void exchange_spin(Lattice* lat, int z, int i1, int j1, int i2, int j2)
@@ -55,62 +65,51 @@ char nesw_sum(const Lattice* lat, int z, int i, int j)
 		+ spin(lat, z, i, (j-1+lat->L)%lat->L);
 }
 
-// Gives the energy change from flipping (z, i1, j1) and (z, i2, j2)
-double energy_diff(const Lattice* lat, int z, int i1, int j1, int i2, int j2)
-{
-	char s = spin(lat, z, i1, j1);
-	char N1 = nesw_sum(lat, z, i1, j1);
-	char N2 = nesw_sum(lat, z, i2, j2);
-	char U1 = spin(lat, (z+1)%lat->Lz, i1, j1)
-		+ spin(lat, (z-1+lat->Lz)%lat->Lz, i1, j1);
-	char U2 = spin(lat, (z+1)%lat->Lz, i2, j2)
-		+ spin(lat, (z-1+lat->Lz)%lat->Lz, i2, j2);
-
-	return 2*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
-}
-
 // Finds 2 random neighbors in the same plane.
-// If opposite spin neighbors are found, then returns true
-bool opposite_random_neighbors(const Lattice* lat, int* z, int* i1, int* j1, int* i2, int* j2)
+// Returns 0 if same spin, otherwise returns s1
+char opposite_random_neighbors(const Lattice* lat,
+	int* z, int* i1, int* j1, int* i2, int* j2)
 {
-	*z = rand_i(0, lat->Lz);
-	*i1 = rand_i(0, lat->L);
-	*j1 = rand_i(0, lat->L);
+	// x & (y - 1) = x % y for y a power of 2. Could use this for slight speed up.
+	uint r1 = fast_rand();
+    *z  = r1 % lat->Lz;           // bits from r1
+    *i1 = *i2 = (r1 >> 8) % lat->L;
+    *j1 = *j2 = (r1 >> 16) % lat->L;
 
 	// choose a random offset
-	int direction = rand() % 4;
+    int direction = (r1 >> 24) % 4; // top 8 bits
 	if (direction == 0)
-		*i2 = (*i1 + 1) % lat->L;
+		*i2 = (*i2 + 1) % lat->L;
 	else if (direction == 1)
-		*i2 = (*i1 - 1 + lat->L) % lat->L;
+		*i2 = (*i2 - 1 + lat->L) % lat->L;
 	else if (direction == 2)
-		*j2 = (*j1 + 1) % lat->L;
+		*j2 = (*j2 + 1) % lat->L;
 	else
-		*j2 = (*j1 - 1 + lat->L) % lat->L;
+		*j2 = (*j2 - 1 + lat->L) % lat->L;
 
-	// Only output if spins are opposite.
-	if (spin(lat, *z, *i1, *j1) == -spin(lat, *z, *i2, *j2))
-		return true;
-	else
-		return false;
+	char s1 = spin(lat, *z, *i1, *j1);
+	char s2 = spin(lat, *z, *i2, *j2);
+	if (s1 == s2) return 0;
+	return s1;
 }
 
-// Finds 2 random neighbors. If they are opposite spin, then flips according to deltaE.
-void try_flip(Lattice* lat)
-{
-	int z, i1, j1, i2, j2;
-	// if random neighbors are opposite:
-	if (opposite_random_neighbors(lat, &z, &i1, &j1, &i2, &j2)) {
-		double deltaE = energy_diff(lat, z, i1, j1, i2, j2);
-		if (deltaE < 0) {
-			exchange_spin(lat, z, i1, j1, i2, j2);
-		}
-		else {
-			double exchange_prob = exp(-deltaE / lat->T);
-			if (rand01() < exchange_prob)
-				exchange_spin(lat, z, i1, j1, i2, j2);
-		}
-	}
+// Finds 2 random neighbors.
+// If they are opposite spin, then flips according to boltzmann factor.
+void try_flip(Lattice* lat) {
+    int z, i1, j1, i2, j2;
+    char s = opposite_random_neighbors(lat, &z, &i1, &j1, &i2, &j2);
+    if (s) {
+        char N1 = nesw_sum(lat, z, i1, j1);
+        char N2 = nesw_sum(lat, z, i2, j2);
+        int zup = (z+1) % lat->Lz;
+        int zdn = (z-1+lat->Lz) % lat->Lz;
+        char U1 = spin(lat, zup, i1, j1) + spin(lat, zdn, i1, j1);
+        char U2 = spin(lat, zup, i2, j2) + spin(lat, zdn, i2, j2);
+
+        double prob = boltzmann_factor(lat, s, N1, N2, U1, U2);
+        if (rand01() < prob)
+            exchange_spin(lat, z, i1, j1, i2, j2);
+    }
 }
 
 // Takes one Monte-Carlo step.
@@ -166,3 +165,4 @@ void export_lattice(const Lattice* lat, char* filepath)
     fclose(file);
 	printf("Exported lattice to %s\n", filepath);
 }
+

@@ -21,7 +21,7 @@ def plot_lattice(filepath, L, Lz):
         ax[z].imshow(lattice[z,:,:], cmap="gray")
     plt.show()
 
-L = 32
+L = 16
 Lz = 8
 plot_lattice("data/lattices/test1", L, Lz)
 plot_lattice("data/lattices/test2", L, Lz)

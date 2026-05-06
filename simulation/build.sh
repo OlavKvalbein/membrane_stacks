@@ -1,3 +1,3 @@
 cd simulation
-gcc main.c lattice.c quantities.c ensembles.c utils.c -o3 -Wall -Wextra -Wuninitialized -o ../out.exe
+gcc -o2 -Wall -Wextra -Wuninitialized -o ../build.exe main.c lattice.c quantities.c ensembles.c utils.c 
 cd ..

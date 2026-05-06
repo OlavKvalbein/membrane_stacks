@@ -48,7 +48,7 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 	clock_t start_time = clock();
 
 	for (int i = 0; i < data->ensemble_size; i++) {
-		reset_lattice(lat);
+		reset_spin(lat);
 
 		// burn in steps
 		do_steps(lat, data->n_burn_in);
