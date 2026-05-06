@@ -29,7 +29,7 @@ int main()
 	// srand(time(NULL));
 	rng_state = 12345;
 
-	double Jz = 0.5;
+	double Jz = 0.1;
 	double T = 2.0;
 	Lattice lat = new_lattice(T, Jz);
 

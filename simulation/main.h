@@ -23,8 +23,8 @@ double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
 
 // should both be divisible by 2
-#define L 64
-#define Lz 8
+#define L 16
+#define Lz 4
 
 typedef struct
 {
