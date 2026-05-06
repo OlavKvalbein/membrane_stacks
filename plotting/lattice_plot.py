@@ -14,6 +14,14 @@ def plot_timeseries(folderpath, n_lattices, L, Lz):
             ax[z][i].imshow(lattices[i][z,:,:], cmap="gray")
     plt.show()
 
-L = 16
-Lz = 4
-plot_timeseries("data/lattice", 9, L, Lz)
+def plot_lattice(filepath, L, Lz):
+    lattice = load_spin(filepath, L, Lz)
+    fig, ax = plt.subplots(ncols=Lz)
+    for z in range(Lz):
+        ax[z].imshow(lattice[z,:,:], cmap="gray")
+    plt.show()
+
+L = 32
+Lz = 8
+plot_lattice("data/lattices/test1", L, Lz)
+plot_lattice("data/lattices/test2", L, Lz)

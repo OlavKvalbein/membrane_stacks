@@ -12,6 +12,11 @@ double rand01();
 int rand_i(int min, int max);
 double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
+#define swap(arr, i, j) ({		\
+	int temp = (arr)[i];		\
+	(arr)[i] = (arr)[j];		\
+	(arr)[j] = temp;			\
+})
 
 typedef struct Lattice
 {
@@ -20,6 +25,7 @@ typedef struct Lattice
 	double T;		// corresponds to T/J
 	double Jz;		// corresponds to Jz/J
 	char *spin;
+	int len;
 } Lattice;
 
 typedef struct SamplingData

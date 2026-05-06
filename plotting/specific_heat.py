@@ -19,6 +19,7 @@ for i in range(len(Ts)):
     sample_from = int((1 - fraction_of_samples)*len(Hs[i]))
 
     # strategy 1: first average H and H^2, then find c. seems unreliable.
+    # this is correct
     # H = np.average(Hs[i][sample_from:])
     # H2 = np.average(H2s[i][sample_from:])
     # c = 1/(L**2 * Lz * T**2) * (H2 - H**2)

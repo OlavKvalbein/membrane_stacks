@@ -28,20 +28,26 @@ int main()
 	clock_t start_time = clock();
 	srand(time(NULL));
 
-	int L = 16;
+	int L = 32;
 	int Lz = 8;
 	double Jz = 1.0;
 	double T = 2.0;
 	Lattice lat = new_lattice(L, Lz, T, Jz);
 
-	SamplingData sampling_data = {
-		.n_steps = 1e5,
-		.ensemble_size = 1,
-		.n_samples = 200,
-		.n_burn_in = 0,
-		.sample_specific_heat = true,
-		.sample_delta2 = true,
-	};
+	export_lattice(&lat, "data/lattices/test1");
+	do_steps(&lat, 10000);
+	export_lattice(&lat, "data/lattices/test2");
+
+	// SamplingData sampling_data = {
+	// 	.n_steps = 1e5,
+	// 	.ensemble_size = 1,
+	// 	.n_samples = 200,
+	// 	.n_burn_in = 0,
+	// 	.sample_specific_heat = true,
+	// 	.sample_delta2 = true,
+	// };
+
+	
 
 	// char folder[] = "data/timeseries/L=16,Lz=8";
 	// double Tmin = 1.5;
@@ -56,9 +62,10 @@ int main()
 	// lower temperatures don't need to run as far to equilibriate.
 	// sampling_data.n_steps = 5'000;
 	// many_timeseries(folder, T2, len(T2), &lat, &sampling_data);
-	run_ensemble(&lat, &sampling_data);
-	export_sampling_data(&sampling_data, &lat,
-		"data/timeseries/test.csv");
+
+	// run_ensemble(&lat, &sampling_data);
+	// export_sampling_data(&sampling_data, &lat,
+	// 	"data/timeseries/test.csv");
 
 	printf("\nTotal program runtime: %.2f min.\n",
 		(double)(clock() - start_time) / (CLOCKS_PER_SEC * 60));
