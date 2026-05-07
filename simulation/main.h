@@ -10,7 +10,7 @@
 
 typedef unsigned int uint;
 
-static uint rng_state = 12345;
+extern uint rng_state;
 
 static inline uint fast_rand() {
     rng_state ^= rng_state << 13;
@@ -18,13 +18,18 @@ static inline uint fast_rand() {
     rng_state ^= rng_state << 5;
     return rng_state;
 }
+
+static inline void seed_rng(uint seed) {
+	rng_state = seed ? seed : 1;  // 0 is a bad seed for xorshift
+}
+
 double rand01();
 double lerp(double a, double b, double t);
 #define len(arr) (sizeof(arr)/sizeof(arr[0]))
 
 // should both be divisible by 2
 #define L 32
-#define Lz 4
+#define Lz 8
 
 typedef struct
 {
@@ -38,18 +43,12 @@ typedef struct
 
 typedef struct SamplingData
 {
-	int ensemble_size;
-	int n_steps;
-	int n_samples;
 	int n_burn_in;
-
 	int sample_period;
-	
-	bool sample_specific_heat;
-	double* H;		// List of hamiltonian at each step
-	double* H2;		// List of hamiltonian^2 at each step
-
-	bool sample_delta2; // delta^2.
+	int n_samples;
+	int ensemble_size;
+		
+	double* H;		// Hamiltonian
 	double* delta2;
 } SamplingData;
 
@@ -66,6 +65,7 @@ double energy(const Lattice* lat);
 double delta2(const Lattice* lat);
 
 // ensembles.c
+// #define ENSEMBLE_FEEDBACK
 void run_ensemble(Lattice* lat, SamplingData* data);
 void export_sampling_data(const SamplingData* data, const Lattice* lat, char* filepath);
 

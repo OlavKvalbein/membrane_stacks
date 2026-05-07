@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+orange, green = "#ff8b5c", "#7fd1ae"
+
 def load_spin(filepath, L, Lz):
     with open(filepath) as f:
         string = f.read()
@@ -27,7 +29,6 @@ def plot_lattice(filepath, L, Lz):
 
 def fancy_plot(filepath, L, Lz):
     spin = load_spin(filepath, L, Lz)
-    up_color, down_color = '#ef476f', '#118ab2'
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
     # 3. Plot each 2D slice as a flat layer in 3D space
@@ -39,7 +40,7 @@ def fancy_plot(filepath, L, Lz):
         facecolors = np.empty((L, L), dtype=object)
         for r in range(L):
             for c in range(L):
-                facecolors[r, c] = up_color if spin[z, r, c] == 1 else down_color
+                facecolors[r, c] = orange if spin[z, r, c] == 1 else green
                 
         # Draw the flat layer
         ax.plot_surface(X, Y, Z, facecolors=facecolors, shade=False)
@@ -61,4 +62,6 @@ def fancy_plot(filepath, L, Lz):
 
 L = 32
 Lz = 4
-fancy_plot("data/lattices/test2", L, Lz)
+# fancy_plot("data/lattices/T=2.0", L, Lz)
+fancy_plot("data/lattices/T=2.5", L, Lz)
+fancy_plot("data/lattices/T=3.0", L, Lz)

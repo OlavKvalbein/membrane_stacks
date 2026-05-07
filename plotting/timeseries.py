@@ -9,6 +9,7 @@ def read_timeseries(path):
     return df
 
 # reads all files of name "T=*****.csv" in a folder
+# steps, Hs, and delta2s are lists of numpy arrays
 def read_timeseries_folder(folderpath):
     # only certain csv files.
     paths = glob.glob(folderpath + "/T=*****.csv")
@@ -17,16 +18,14 @@ def read_timeseries_folder(folderpath):
 
     steps = []
     Hs = []
-    H2s = []
     delta2s = []
     for path in paths:
         df = read_timeseries(path)
         steps.append(df["step"].to_numpy())
         Hs.append(df["H"].to_numpy())
-        H2s.append(df["H^2"].to_numpy())
         delta2s.append(df["delta^2"].to_numpy())
 
-    return (Ts, steps, Hs, H2s, delta2s)
+    return (Ts, steps, Hs, delta2s)
 
 # plots the timeseries in one csv file
 def plot_timeseries(filepath):
@@ -45,7 +44,7 @@ def plot_timeseries(filepath):
     
 # plots timeseries in a folder.
 def plot_timeseries_folder(folderpath):
-    Ts, steps, Hs, _, delta2s = read_timeseries_folder(folderpath)
+    Ts, steps, Hs, delta2s = read_timeseries_folder(folderpath)
 
     fig, ax = plt.subplots(ncols=2, nrows=1)
 
@@ -58,10 +57,14 @@ def plot_timeseries_folder(folderpath):
     ax[0].set_title("Hamiltonian $H$")
     ax[1].set_title(r"$\delta^2$")
     plt.legend()
-    plt.show()
+    plt.savefig(folderpath + "/figure.png")
 
 if __name__ == "__main__":
     # folderpath = "data/timeseries/L=8,Lz=4"
     # folderpath = "data/timeseries/L=16,Lz=8"
-    testpath = "data/timeseries/test.csv"
-    plot_timeseries(testpath)
+
+    # testpath = "data/timeseries/test.csv"
+    # plot_timeseries(testpath)
+
+    folderpath = "data/timeseries/test"
+    plot_timeseries_folder(folderpath)
