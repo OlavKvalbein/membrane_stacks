@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from timeseries import read_timeseries_folder
 
 # folderpath = "data/timeseries/L=32,Lz=8/J=0.1"
-# folderpath = "data/timeseries/L=32,Lz=8/J=0.5"
-folderpath = "data/timeseries/L=32,Lz=8/J=1.0"
+folderpath = "data/timeseries/L=32,Lz=8/J=0.5"
+# folderpath = "data/timeseries/L=32,Lz=8/J=1.0"
 
 n_sites = 32*32*8
 # n_sites = 16*16*8
