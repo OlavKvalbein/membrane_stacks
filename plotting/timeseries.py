@@ -40,7 +40,7 @@ def plot_timeseries(filepath):
 
     ax[0].set_title("Hamiltonian $H$")
     ax[1].set_title(r"$\delta^2$")
-    plt.show()
+    plt.savefig(filepath + ".png")
     
 # plots timeseries in a folder.
 def plot_timeseries_folder(folderpath):
@@ -63,8 +63,8 @@ if __name__ == "__main__":
     # folderpath = "data/timeseries/L=8,Lz=4"
     # folderpath = "data/timeseries/L=16,Lz=8"
 
-    # testpath = "data/timeseries/test.csv"
-    # plot_timeseries(testpath)
+    testpath = "data/timeseries/test.csv"
+    plot_timeseries(testpath)
 
-    folderpath = "data/timeseries/test"
-    plot_timeseries_folder(folderpath)
+    # folderpath = "data/timeseries/test"
+    # plot_timeseries_folder(folderpath)

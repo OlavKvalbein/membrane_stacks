@@ -1,3 +1,5 @@
 /.vscode
-simulation.exe
-out.exe
+build.exe
+build_op1.exe
+build_op2.exe
+build_op3.exe
