@@ -43,7 +43,7 @@ Lattice new_lattice(double T, double Jz)
 {
 	Lattice lat = {.T = T, .Jz = Jz};
 	reset_spin(&lat);
-	precompute_boltzmann_table(&lat);
+	// precompute_boltzmann_table(&lat);
 
 	return lat;
 }
@@ -98,14 +98,15 @@ void try_flip(Lattice* lat) {
 		char U1 = lat->spin[zup][i1][j1] + lat->spin[zdn][i1][j1];
 		char U2 = lat->spin[zup][i2][j2] + lat->spin[zdn][i2][j2];
 
-		// table lookup version
+		// table lookup version, slightly faster
+		// WARNING: not correct
 		// double prob = boltzmann_factor(lat, s, N1, N2, U1, U2);
 		// if (rand01() < prob) {
 		// 	lat->spin[z][i1][j1] *= -1;
 		// 	lat->spin[z][i2][j2] *= -1;
 		// }
 
-		// directly compute version, actually faster
+		// directly compute version
 		// the +2s term accounts for the neighborhood sums changing
 		double dE = 2.0*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
 		if (dE < 0 || rand01() < exp(-dE / lat->T)) {

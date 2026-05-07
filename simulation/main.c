@@ -34,41 +34,45 @@ int main()
 
 	// seed_rng(time(NULL));
 	seed_rng(123456);
-
-	double T = 3.0;
-	double Jz = 0.1;
-	Lattice lat = new_lattice(T, Jz);
-
-	// do_steps(&lat, 1e6);
-	// export_lattice(&lat, "data/lattices/T=3.0");
-
-	
-	char folder[] = "data/timeseries/L=32,Lz=8/J=0.1";
 	
 	// sample temperatures for each Jz = 0.1, 0.5, 1.0
 	// Tmiddle is where we think T_c is
-
-	// Jz = 0.1
-	double Ts[] 		= {
-		1.83333333,
-
-		2.        , 2.05357143, 2.10714286, 2.16071429, 2.21428571,
-		2.26785714, 2.32142857, 2.375     , 2.42857143, 2.48214286,
-		2.53571429, 2.58928571, 2.64285714, 2.69642857, 2.75,	
-
-		3.  , 3.25, 3.5
+	//=======================================================
+	// double Jz = 0.1;
+	// char folder[] = "data/timeseries/L=32,Lz=8/J=0.1";
+	// double Ts[] = {
+	// 	1.75,
+	// 	2.        , 2.05357143, 2.10714286, 2.16071429, 2.21428571,
+	// 	2.26785714, 2.32142857, 2.375     , 2.42857143, 2.48214286,
+	// 	2.53571429, 2.58928571, 2.64285714, 2.69642857, 2.75,	
+	// 	3.  , 3.25, 3.5
+	// };
+	
+	// double Jz = 0.5;
+	// char folder[] = "data/timeseries/L=32,Lz=8/J=0.5";
+	// double Ts[] = {
+	// 	2.75,
+	// 	3.0       , 3.05357143, 3.10714286, 3.16071429, 3.21428571,
+	//   	3.26785714, 3.32142857, 3.375     , 3.42857143, 3.48214286,
+	//    	3.53571429, 3.58928571, 3.64285714, 3.69642857, 3.75,
+	// 	4.0,4.25,4.5,
+	// };
+	
+	double Jz = 1.0;
+	char folder[] = "data/timeseries/L=32,Lz=8/J=1.0";
+	double Ts[] = {
+		3.0,3.25,3.5,3.75,4.0,4.25,4.5,4.75,5.0
 	};
-	
-	// Jz = 0.5
-	
-	// Jz = 1.0
+	//=================================================
 		
-		
+	double T = 3.0;		// this is whatever
+	Lattice lat = new_lattice(T, Jz);
+
 	SamplingData sampling_data = {
 		.n_burn_in = 1e5,
 		.n_samples = 100,
 		.sample_period = 20, 	// same as Hoshino
-		.ensemble_size = 1,
+		.ensemble_size = 2,
 	};
 
 	many_timeseries(folder, Ts, len(Ts), &lat, &sampling_data);
