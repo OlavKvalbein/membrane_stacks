@@ -8,25 +8,17 @@ double energy(const Lattice* lat)
 	int sum1 = 0;
 	int sum2 = 0;
 
-	for (int z = 0; z < lat->Lz; z++) { 
-		for (int i = 0; i < lat->L; i++) {
-		   for (int j = 0; j < lat->L; j++) {
-				char s = spin(lat, z, i, j);
+	for (int z = 0; z < Lz; z++) { 
+		for (int i = 0; i < L; i++) {
+		   for (int j = 0; j < L; j++) {
+				char s = lat->spin[z][i][j];
 				sum1 += s * nesw_sum(lat, z, i, j);
-				sum2 += s * spin(lat, (z+1)%lat->Lz, i, j);
+				sum2 += s * lat->spin[(z+1)%Lz][i][j];
 	}}}
 	sum1 /= 2; // accounting for double summation
 
 	double H = - sum1 - lat->Jz*sum2;
 	return H;
-}
-
-double mean_spin(const Lattice* lat)
-{
-	double mean = 0;
-	for (int i = 0; i < lat->len; i++)
-		mean += lat->spin[i];
-	return mean / lat->len;
 }
 
 double delta2(const Lattice* lat)
@@ -37,15 +29,12 @@ double delta2(const Lattice* lat)
 	// The ensemble mean will be accounted for when delta2 is averaged over ensembles.
 	// Then we could average the ensemble mean over a time where the lattice is equilibriated.
 
-	int L = lat->L;
-	int Lz = lat->Lz;
-
 	double outer_sum = 0;
 	for (int i = 0; i < L; i++) {
 		for (int j = 0; j < L; j++) {
 			int inner_sum = 0;
 			for (int z = 0; z < Lz; z++)
-				inner_sum += spin(lat, z, i, j);	// mean layer spin = 0
+				inner_sum += lat->spin[z][i][j];	// mean layer spin = 0
 			outer_sum += inner_sum*inner_sum;
 		}
 	}

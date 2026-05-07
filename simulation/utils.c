@@ -3,7 +3,10 @@
 // random double in [0, 1]
 double rand01()
 {
-	return (double)fast_rand() / RAND_MAX;
+	// return (double)rand() / RAND_MAX;
+
+	// 2^32 = 4294967296, the max value of fast_rand
+	return fast_rand() * (1.0/4294967296.0);
 }
 
 // random integer in [min, max]

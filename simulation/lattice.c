@@ -4,7 +4,7 @@ void precompute_boltzmann_table(Lattice* lat) {
     for (int s = -1; s <= 1; s += 2)
     for (int dN = -8; dN <= 8; dN += 2)   // N1-N2
     for (int dU = -4; dU <= 4; dU++) {     // U1-U2
-        double dE = 2.0*s*(dN + lat->Jz*dU);
+        double dE = 2.0*s*(dN + 2*s + lat->Jz*dU);
         double factor = (dE < 0) ? 1.0 : exp(-dE / lat->T);
         lat->boltzmann_table[(s+1)/2][(dN+8)/2][dU+4] = factor;
     }
@@ -53,13 +53,14 @@ Lattice new_lattice(double T, double Jz)
 char opposite_random_neighbors(const Lattice* lat,
 	int* z, int* i1, int* j1, int* i2, int* j2)
 {
-	uint r1 = fast_rand();		// random number multiple times
+	uint r1 = fast_rand();		// random number used multiple times
+	uint r2 = fast_rand();
 	*z  = r1 % Lz;           // bits from r1
 	*i1 = *i2 = (r1 >> 8) % L;
 	*j1 = *j2 = (r1 >> 16) % L;
 	
 	// choose a random offset
-	int direction = (r1 >> 24) % 4; // top 8 bits
+	int direction = r2 % 4; // top 8 bits
 	if (direction == 0)
 		*i2 = (*i2 + 1) % L;
 	else if (direction == 1)
@@ -105,7 +106,8 @@ void try_flip(Lattice* lat) {
 		// }
 
 		// directly compute version, actually faster
-		double dE = 2.0*s*(N1 - N2 + lat->Jz*(U1 - U2));
+		// the +2s term accounts for the neighborhood sums changing
+		double dE = 2.0*s*(N1 - N2 + 2*s + lat->Jz*(U1 - U2));
 		if (dE < 0 || rand01() < exp(-dE / lat->T)) {
 			lat->spin[z][i1][j1] *= -1;
 			lat->spin[z][i2][j2] *= -1;
@@ -115,8 +117,7 @@ void try_flip(Lattice* lat) {
 
 void do_steps(Lattice* lat, int n)
 {
-	for (int i = 0; i < n; i++)
-	for (int j = 0; j < L*L*Lz; j++)
+	for (int i = 0; i < n*L*L*Lz; i++)
 		try_flip(lat);
 }
 

@@ -59,6 +59,6 @@ def fancy_plot(filepath, L, Lz):
     plt.savefig(filepath+".png", bbox_inches='tight')
 
 
-L = 16
+L = 32
 Lz = 4
 fancy_plot("data/lattices/test2", L, Lz)

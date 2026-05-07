@@ -34,7 +34,7 @@ int main()
 	Lattice lat = new_lattice(T, Jz);
 
 	export_lattice(&lat, "data/lattices/test1");
-	do_steps(&lat, 1e7);
+	do_steps(&lat, 1e5);
 	export_lattice(&lat, "data/lattices/test2");
 
 	// SamplingData sampling_data = {
@@ -45,6 +45,9 @@ int main()
 	// 	.sample_specific_heat = true,
 	// 	.sample_delta2 = true,
 	// };
+	// run_ensemble(&lat, &sampling_data);
+	// export_sampling_data(&sampling_data, &lat,
+	// 	"data/timeseries/test.csv");
 
 	
 
@@ -62,9 +65,6 @@ int main()
 	// sampling_data.n_steps = 5'000;
 	// many_timeseries(folder, T2, len(T2), &lat, &sampling_data);
 
-	// run_ensemble(&lat, &sampling_data);
-	// export_sampling_data(&sampling_data, &lat,
-	// 	"data/timeseries/test.csv");
 
 	printf("\nTotal program runtime: %.2f min.\n",
 		(double)(clock() - start_time) / (CLOCKS_PER_SEC * 60));

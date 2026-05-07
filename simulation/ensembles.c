@@ -7,10 +7,10 @@ void init_sampling_data(SamplingData* data)
 
 	if (data->sample_specific_heat) {
 		data->H = (double*)malloc(data->n_samples*sizeof(double));
-		data->H2 = (double*)malloc(data->n_samples*sizeof(double));
+		// data->H2 = (double*)malloc(data->n_samples*sizeof(double));
 		for (int i = 0; i < data->n_samples; i++) {
 			data->H[i] = 0;
-			data->H2[i] = 0;
+			// data->H2[i] = 0;
 		}
 	}
 
@@ -29,7 +29,7 @@ void sample_lattice(const Lattice* lat, int sample_nr, SamplingData* data)
 	if (data->sample_specific_heat) {
 		double hamil = energy(lat);
 		data->H[sample_nr] += hamil; 
-		data->H2[sample_nr] += hamil*hamil;
+		// data->H2[sample_nr] += hamil*hamil;
 	}
 
 	if (data->sample_delta2) {
@@ -67,7 +67,7 @@ void run_ensemble(Lattice* lat, SamplingData* data)
 	// divide each sampled variable by ensemble size to get ensemble averages.
 	for (int i = 0; i < data->n_samples; i++) {
 		data->H[i] /= data->ensemble_size;
-		data->H2[i] /= data->ensemble_size;
+		// data->H2[i] /= data->ensemble_size;
 		data->delta2[i] /= data->ensemble_size;
 	}
 
@@ -83,12 +83,12 @@ void export_sampling_data(const SamplingData* data, const Lattice* lat, char* fi
 	fprintf(file, "# Ensemble size: %i, Steps: %i, Burn in steps: %i, Samples: %i\n",
 		data->ensemble_size, data->n_steps, data->n_burn_in, data->n_samples);
 	fprintf(file, "# L = %i, Lz = %i, T = %.3f, Jz = %.4f\n",
-		lat->L, lat->Lz, lat->T, lat->Jz);
+		L, Lz, lat->T, lat->Jz);
 
 	// headers
 	fprintf(file, "step,");
 	if (data->sample_specific_heat)
-		fprintf(file, "H,H^2,");
+		fprintf(file, "H,");
 	if (data->sample_delta2)
 		fprintf(file, "delta^2,");
 	putc('\n', file);
@@ -99,7 +99,7 @@ void export_sampling_data(const SamplingData* data, const Lattice* lat, char* fi
 		fprintf(file, "%i,", step);
 
 		if (data->sample_specific_heat)
-			fprintf(file, "%f,%f,", data->H[i], data->H2[i]);
+			fprintf(file, "%f,", data->H[i]);
 
 		if (data->sample_delta2)
 			fprintf(file, "%f,", data->delta2[i]);
