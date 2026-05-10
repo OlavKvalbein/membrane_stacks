@@ -32,10 +32,10 @@ int main()
 {
 	clock_t start_time = clock();
 
-	// seed_rng(time(NULL));
-	seed_rng(123456);
+	seed_rng(time(NULL));
+	// seed_rng(123456);
 	
-	#define Jz_OPTION 3		// 1, 2 or 3
+	#define Jz_OPTION 2		// 1, 2 or 3
 	// sample temperatures for each Jz = 0.1, 0.5, 1.0
 	// Tmiddle is where we think T_c is
 	//=======================================================
@@ -71,30 +71,35 @@ int main()
 	
 	// shared Ts:
 	double Ts[] = {
-		1.        , 1.08163265, 1.16326531, 1.24489796, 1.32653061,
-       1.40816327, 1.48979592, 1.57142857, 1.65306122, 1.73469388,
-       1.81632653, 1.89795918, 1.97959184, 2.06122449, 2.14285714,
-       2.2244898 , 2.30612245, 2.3877551 , 2.46938776, 2.55102041,
-       2.63265306, 2.71428571, 2.79591837, 2.87755102, 2.95918367,
-       3.04081633, 3.12244898, 3.20408163, 3.28571429, 3.36734694,
-       3.44897959, 3.53061224, 3.6122449 , 3.69387755, 3.7755102 ,
-       3.85714286, 3.93877551, 4.02040816, 4.10204082, 4.18367347,
-       4.26530612, 4.34693878, 4.42857143, 4.51020408, 4.59183673,
-       4.67346939, 4.75510204, 4.83673469, 4.91836735, 5.
+	// 	1.        , 1.08163265, 1.16326531, 1.24489796, 1.32653061,
+    //    1.40816327, 
+	//    1.48979592, 1.57142857, 1.65306122, 1.73469388,	// these have 10^6 burn in steps 
+    //    1.81632653, 
+	   1.89795918, 1.97959184, 2.06122449, 2.14285714,
+    //    2.2244898 , 2.30612245, 2.3877551 , 2.46938776, 2.55102041,
+    //    2.63265306, 2.71428571, 2.79591837, 2.87755102, 2.95918367,
+    //    3.04081633, 3.12244898, 3.20408163, 3.28571429, 3.36734694,
+    //    3.44897959, 3.53061224, 3.6122449 , 3.69387755, 3.7755102 ,
+    //    3.85714286, 3.93877551, 4.02040816, 4.10204082, 4.18367347,
+    //    4.26530612, 4.34693878, 4.42857143, 4.51020408, 4.59183673,
+    //    4.67346939, 4.75510204, 4.83673469, 4.91836735, 5.
 	};
 	
 	SamplingData sampling_data = {
-		// seems like even T=1.0 equilibriates after 1e5 steps
-		.n_burn_in = 1e5,
+		.n_burn_in = 1e6,
 		.n_samples = 1000,
 		.sample_period = 20, 	// same as Hoshino
 		.ensemble_size = 10,
 	};
 	
-	Lattice lat = new_lattice(1.0, Jz);		// T argument is ignored
+	Lattice lat = new_lattice(2.0, Jz);		// T argument is ignored
 	// run_ensemble(&lat, &sampling_data);
 	// export_sampling_data(&sampling_data, &lat, "data/timeseries/test.csv");
-	many_timeseries(folder, Ts, len(Ts), &lat, &sampling_data);
+
+	// many_timeseries(folder, Ts, len(Ts), &lat, &sampling_data);
+
+	do_steps(&lat, 1e6);
+	export_lattice(&lat, "data/lattices/T=3.0");
 
 	printf("\nTotal program runtime: %.2f min.\n",
 		(double)(clock() - start_time) / (CLOCKS_PER_SEC * 60));

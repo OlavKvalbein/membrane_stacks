@@ -56,12 +56,15 @@ def fancy_plot(filepath, L, Lz):
     ax.set_proj_type("ortho")
     # ax.set_box_aspect((1, 1, 1.5))
     ax.view_init(elev=25, azim=-45)
+    fig.set_facecolor("#fdfbf8")
+    ax.set_facecolor("#fdfbf8")
 
     plt.savefig(filepath+".png", bbox_inches='tight')
 
 
 L = 32
 Lz = 4
-# fancy_plot("data/lattices/T=2.0", L, Lz)
+fancy_plot("data/lattices/T=1.5", L, Lz)
+fancy_plot("data/lattices/T=2.0", L, Lz)
 fancy_plot("data/lattices/T=2.5", L, Lz)
 fancy_plot("data/lattices/T=3.0", L, Lz)

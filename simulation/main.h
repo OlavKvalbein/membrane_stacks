@@ -29,7 +29,7 @@ double lerp(double a, double b, double t);
 
 // should both be divisible by 2
 #define L 32
-#define Lz 8
+#define Lz 4
 
 typedef struct
 {
